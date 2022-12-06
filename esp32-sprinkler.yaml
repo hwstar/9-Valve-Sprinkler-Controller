@@ -34,6 +34,7 @@ logger:
 api:
   password: !secret esphome_api_password
   # https://esphome.io/components/api
+  reboot_timeout: 24h
 
 
 ota:
