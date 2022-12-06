@@ -1,0 +1,243 @@
+esphome:
+  name: esp32-sprinkler
+  platform: ESP32
+  board: esp32doit-devkit-v1
+  on_boot:
+    then:
+      # LED test
+      - ds1307.read_time:
+      - output.turn_on: fault_led
+      - output.turn_on: lcd_backlight
+      - delay: 2s
+      - output.turn_off: fault_led
+      - output.turn_off: lcd_backlight
+      
+  
+    
+wifi:
+  use_address: 192.168.31.224
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
+    - ssid: !secret sec_wifi_ssid
+      password: !secret sec_wifi_password
+
+web_server:
+  port: 80
+  # https://esphome.io/components/web_server.html
+
+
+ # https://esphome.io/components/logger
+logger:
+  level: VERBOSE
+
+api:
+  password: !secret esphome_api_password
+  # https://esphome.io/components/api
+
+
+ota:
+  password: !secret esphome_ota_password
+  # https://esphome.io/components/ota
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+  
+  - platform: sntp
+    timezone: America/Los_Angeles
+    id: sntp_time 
+    on_time_sync:
+      then:
+        - ds1307.write_time
+    
+  - platform: ds1307
+    update_interval: never
+    id: ds1307_time
+  
+# 1602 LCD display
+display:
+  - platform: lcd_gpio
+    id: the_display
+    dimensions: 16x2
+    data_pins:
+      - GPIO23
+      - GPIO25
+      - GPIO26
+      - GPIO27
+    enable_pin: GPIO18
+    rs_pin: GPIO17
+    # this lambda is required. If it is missing esphome will go into a boot loop.
+    lambda: |-
+        // Current state
+        it.print(0, 0, "IDLE");
+        // Print the current time
+        it.strftime(11, 0, "%H:%M", id(sntp_time).now());
+i2c:
+  sda: 21
+  scl: 22
+  id: bus_a
+
+external_components:
+- source:
+    type: local
+    path: custom_components/pca9554
+  
+    
+pca9554:
+    id: pca9554_stations_1_8
+    address: 0x38 # For the PCA9554A part
+
+switch:
+  - platform: restart
+    name: "Sprinkler Restart"
+
+output:
+# Station 0
+  - platform: gpio
+    id: station0
+    pin:
+      number: GPIO19
+      mode:
+        output: true
+      inverted: false
+ 
+# Station 1  
+  - platform: gpio
+    id: station1
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 0
+      mode:
+        output: true
+      inverted: false
+  
+ # Station 2      
+  - platform: gpio
+    id: station2
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 1
+      mode:
+        output: true
+      inverted: false
+  
+ # Station 3  
+  - platform: gpio
+    id: station3
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 2
+      mode:
+        output: true
+      inverted: false
+  
+ # Station 4    
+  - platform: gpio
+    id: station4
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 3
+      mode:
+        output: true
+      inverted: false
+  
+ # Station 5
+  - platform: gpio
+    id: station5
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 4
+      mode:
+        output: true
+      inverted: false
+  
+ # Station 6 
+  - platform: gpio
+    id: station6
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 5
+      mode:
+        output: true
+      inverted: false
+
+ # Station 7
+  - platform: gpio
+    id: station7
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 6
+      mode:
+        output: true
+      inverted: false
+      
+ # Station 8
+
+  - platform: gpio
+    id: station8
+    pin:
+      pca9554: pca9554_stations_1_8
+      number: 7
+      mode:
+        output: true
+      inverted: false
+    
+  # LCD backlight
+  - platform: gpio
+    id: lcd_backlight
+    pin:
+      number: GPIO13
+      mode:
+        output: true
+      inverted: false
+
+  - platform: gpio
+    id : fault_led
+    pin:
+      number: GPIO5
+      mode:
+        output: true
+      inverted: false 
+ 
+binary_sensor:
+
+ # Button 1 - LCD backlight
+  - platform: gpio
+    id: button1
+    pin:
+      number: GPIO32
+      mode:
+        input: true
+      inverted: true
+    filters:
+      delayed_on_off: 10ms
+    on_press:
+      output.turn_on: lcd_backlight
+    on_release:
+      then:
+       -  delay: 30s
+       -  output.turn_off: lcd_backlight
+      
+# Button 2
+  - platform: gpio
+    id: button2
+    pin:
+      number: GPIO33
+      mode:
+        input: true
+      inverted: true
+    filters:
+      delayed_on_off: 10ms
+      
+# Button 3   
+  - platform: gpio
+    id: button3
+    pin:
+      number: GPIO34
+      mode:
+        input: true
+      inverted: true
+    filters:
+      delayed_on_off: 10ms
+   
