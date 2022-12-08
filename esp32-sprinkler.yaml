@@ -273,7 +273,7 @@ sensor:
         # 2.02 volts per amp
         # convert Apk to Arms
       - lambda: |-
-          float a = (x/2.02)*0.7;
+          float a = (x/2.02)*0.707;
           if (a < 0.08)
             return 0.0;
           else
