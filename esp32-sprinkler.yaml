@@ -1,7 +1,7 @@
 esphome:
   name: esp32-sprinkler
   platform: ESP32
-  board: esp32doit-devkit-v1
+  board: esp32dev
   on_boot:
     then:
       # LED test
@@ -55,7 +55,25 @@ time:
   - platform: ds1307
     update_interval: never
     id: ds1307_time
-  
+ 
+# Example minimal configuration entry
+sprinkler:
+  - id: sprinkler_ctrlr
+    main_switch: "Sprinklers"
+    auto_advance_switch: "Sprinklers Auto Advance"
+    valves:
+      - valve_switch: "Station 1"
+        enable_switch: "Enable Station 1"
+        run_duration: 30s
+        valve_switch_id: station1
+      - valve_switch: "Station 2"
+        enable_switch: "Enable Station 2"
+        run_duration: 30s
+        valve_switch_id: station2
+
+
+
+ 
 # 1602 LCD display
 display:
   - platform: lcd_gpio
@@ -91,9 +109,8 @@ pca9554:
 
 switch:
   - platform: restart
-    name: "Sprinkler Restart"
-
-output:
+    name: "Reboot Sprinkler Controller"
+   
 # Station 0
   - platform: gpio
     id: station0
@@ -183,7 +200,8 @@ output:
       mode:
         output: true
       inverted: false
-    
+   
+output:   
   # LCD backlight
   - platform: gpio
     id: lcd_backlight
@@ -242,3 +260,23 @@ binary_sensor:
     filters:
       delayed_on_off: 10ms
    
+sensor:
+    # Valve Current sensor
+  - platform: adc
+    pin: GPIO36
+    attenuation: auto
+    update_interval: 2000ms
+    id: iadc
+    name: "Total valve current"
+    unit_of_measurement: "A"
+    filters:
+        # 2.02 volts per amp
+        # convert Apk to Arms
+      - lambda: |-
+          float a = (x/2.02)*0.7;
+          if (a < 0.08)
+            return 0.0;
+          else
+            return a;
+          
+    
