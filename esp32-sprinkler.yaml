@@ -1,3 +1,5 @@
+
+
 esphome:
   name: esp32-sprinkler
   platform: ESP32
@@ -110,7 +112,7 @@ pca9554:
 switch:
   - platform: restart
     name: "Reboot Sprinkler Controller"
-   
+
 # Station 0
   - platform: gpio
     id: station0
@@ -210,15 +212,16 @@ output:
       mode:
         output: true
       inverted: false
-
+  # Fault LED
   - platform: gpio
     id : fault_led
     pin:
-      number: GPIO5
+      number: GPIO14
       mode:
         output: true
       inverted: false 
- 
+   
+
 binary_sensor:
 
  # Button 1 - LCD backlight
@@ -249,7 +252,7 @@ binary_sensor:
     filters:
       delayed_on_off: 10ms
       
-# Button 3   
+# Button 3   - Clear fault 
   - platform: gpio
     id: button3
     pin:
@@ -258,7 +261,12 @@ binary_sensor:
         input: true
       inverted: true
     filters:
-      delayed_on_off: 10ms
+      delayed_on_off: 1s  #Must be pressed for 1 second
+    on_press:
+      then: 
+        - output.turn_off: fault_led
+       
+      
    
 sensor:
     # Valve Current sensor
@@ -278,5 +286,12 @@ sensor:
             return 0.0;
           else
             return a;
-          
+    on_value_range:
+        - above: 0.8
+          then: 
+            - output.turn_on: fault_led
+            - sprinkler.shutdown: sprinkler_ctrlr
+            
+  
+    
     
