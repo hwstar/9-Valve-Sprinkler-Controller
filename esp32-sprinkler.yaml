@@ -1,4 +1,20 @@
 
+substitutions:
+  # Idle state strings for local display [16 chars max]
+   stations_idle_string: "All stations OFF" 
+   station_0_on_string: "Station 0 ON" 
+  
+
+globals:
+  - id: stations_status_string
+    type: std::string
+    restore_value: no  
+    initial_value: '"${stations_idle_string}"'
+    
+  - id: run_state_string
+    type: std::string
+    restore_value: no  
+    initial_value: '"${run_state_idle_string}"'
 
 esphome:
   name: esp32-sprinkler
@@ -31,7 +47,7 @@ web_server:
 
  # https://esphome.io/components/logger
 logger:
-  level: VERBOSE
+  level: INFO
 
 api:
   password: !secret esphome_api_password
@@ -57,6 +73,15 @@ time:
   - platform: ds1307
     update_interval: never
     id: ds1307_time
+ 
+external_components:
+  - source:
+      type: local
+      path: custom_components/pca9554
+  - source:
+      type: local
+      path:  custom_components/sprinkler
+  
  
 # Example minimal configuration entry
 sprinkler:
@@ -90,8 +115,12 @@ display:
     rs_pin: GPIO17
     # this lambda is required. If it is missing esphome will go into a boot loop.
     lambda: |-
-        // Current state
-        it.print(0, 0, "IDLE");
+        // Line 0
+        // Current run state
+        char run_state_string[9];
+        run_state_string[8] = 0;
+        strncpy(run_state_string, id(sprinkler_ctrlr).current_ctrlr_state_as_str().c_str(), 8);
+        it.print(0, 0, run_state_string );
         // Print the current time
         it.strftime(11, 0, "%H:%M", id(sntp_time).now());
 i2c:
@@ -99,11 +128,7 @@ i2c:
   scl: 22
   id: bus_a
 
-external_components:
-- source:
-    type: local
-    path: custom_components/pca9554
-  
+
     
 pca9554:
     id: pca9554_stations_1_8
@@ -273,7 +298,7 @@ sensor:
   - platform: adc
     pin: GPIO36
     attenuation: auto
-    update_interval: 2000ms
+    update_interval: 500ms
     id: iadc
     name: "Total valve current"
     unit_of_measurement: "A"
@@ -288,9 +313,13 @@ sensor:
             return a;
     on_value_range:
         - above: 0.8
-          then: 
-            - output.turn_on: fault_led
+          then:
             - sprinkler.shutdown: sprinkler_ctrlr
+            - logger.log:
+                format:    "Overcurrent fault!"
+                level:  ERROR            
+            - output.turn_on: fault_led
+          
             
   
     
