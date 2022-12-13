@@ -1,10 +1,17 @@
 
 substitutions:
   # Idle state strings for local display [16 chars max]
-   stations_idle_string: "All stations OFF" 
+   stations_idle_string: "All Stations OFF" 
    station_0_on_string: "Station 0 ON" 
+   station_1_on_string: "Station 1 ON" 
+   station_2_on_string: "Station 2 ON" 
+   station_3_on_string: "Station 3 ON"
+   station_4_on_string: "Station 4 ON"    
+   station_5_on_string: "Station 5 ON" 
+   station_6_on_string: "Station 6 ON" 
+   station_7_on_string: "Station 7 ON" 
+   station_8_on_string: "Station 8 ON" 
   
-
 globals:
   - id: stations_status_string
     type: std::string
@@ -89,6 +96,10 @@ sprinkler:
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
     valves:
+      - valve_switch: "Station 0"
+        enable_switch: "Enable Station 0"
+        run_duration: 30s
+        valve_switch_id: station0
       - valve_switch: "Station 1"
         enable_switch: "Enable Station 1"
         run_duration: 30s
@@ -97,6 +108,32 @@ sprinkler:
         enable_switch: "Enable Station 2"
         run_duration: 30s
         valve_switch_id: station2
+      - valve_switch: "Station 3"
+        enable_switch: "Enable Station 3"
+        run_duration: 30s
+        valve_switch_id: station3
+      - valve_switch: "Station 4"
+        enable_switch: "Enable Station 4"
+        run_duration: 30s
+        valve_switch_id: station4
+      - valve_switch: "Station 5"
+        enable_switch: "Enable Station 5"
+        run_duration: 30s
+        valve_switch_id: station5
+      - valve_switch: "Station 6"
+        enable_switch: "Enable Station 6"
+        run_duration: 30s
+        valve_switch_id: station6
+      - valve_switch: "Station 7"
+        enable_switch: "Enable Station 7"
+        run_duration: 30s
+        valve_switch_id: station7
+      - valve_switch: "Station 8"
+        enable_switch: "Enable Station 8"
+        run_duration: 30s
+        valve_switch_id: station8
+        
+        
 
 # 1602 LCD display
 display:
@@ -120,6 +157,8 @@ display:
         it.print(0, 0, run_state_string );
         // Print the current time
         it.strftime(11, 0, "%H:%M", id(sntp_time).now());
+        // Line 1
+        it.print(0, 1, id(stations_status_string));
 i2c:
   sda: 21
   scl: 22
@@ -134,7 +173,7 @@ pca9554:
 switch:
   - platform: restart
     name: "Reboot Sprinkler Controller"
-
+  
 # Station 0
   - platform: gpio
     id: station0
@@ -143,6 +182,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 0 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_0_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 0 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
  
 # Station 1  
   - platform: gpio
@@ -153,6 +205,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 1 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_1_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 1 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
   
  # Station 2      
   - platform: gpio
@@ -163,7 +228,20 @@ switch:
       mode:
         output: true
       inverted: false
-  
+    on_turn_on:
+    - logger.log: 
+        format: "Station 2 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_2_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 2 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
+ 
  # Station 3  
   - platform: gpio
     id: station3
@@ -173,6 +251,20 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 3 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_3_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 3 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");  
+      
   
  # Station 4    
   - platform: gpio
@@ -183,6 +275,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Station 4 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_4_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 4 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
   
  # Station 5
   - platform: gpio
@@ -193,6 +298,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 5 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_5_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 5 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
   
  # Station 6 
   - platform: gpio
@@ -203,6 +321,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 6 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_6_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 6 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
 
  # Station 7
   - platform: gpio
@@ -213,6 +344,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 7 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_7_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Station 7 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
       
  # Station 8
 
@@ -224,6 +368,19 @@ switch:
       mode:
         output: true
       inverted: false
+    on_turn_on:
+    - logger.log: 
+        format: "Station 8 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${station_8_on_string}");
+
+    on_turn_off:
+    - logger.log: 
+        format: "Station 8 turned off"
+        level: "INFO"
+    - lambda: |-
+        id(stations_status_string) = to_string("${stations_idle_string}");
    
 output:   
   # LCD backlight
