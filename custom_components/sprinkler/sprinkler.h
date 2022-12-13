@@ -359,7 +359,11 @@ class Sprinkler : public Component, public EntityBase {
   
   /// returns the current FSM state as a string
   std::string current_ctrlr_state_as_str();
- 
+  
+  /// Returns true of the sprinkler controller is running
+  bool is_running();
+   
+
  protected:
   uint32_t hash_base() override;
 

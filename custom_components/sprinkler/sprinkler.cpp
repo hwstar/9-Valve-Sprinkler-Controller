@@ -1352,5 +1352,17 @@ std::string Sprinkler::current_ctrlr_state_as_str(){
     return this->state_as_str_(this->state_); 
 }
 
+//
+// Added to return whether the controller is running or not
+//
+
+bool Sprinkler::is_running(){
+	  if(this->state_ != IDLE)
+		  return true;
+	  else
+		  return false;
+}	  
+  
+
 }  // namespace sprinkler
 }  // namespace esphome
