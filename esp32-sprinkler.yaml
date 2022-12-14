@@ -1,7 +1,14 @@
+#
+# Example #1: Generic 9 valve example for the hwstar sprinkler conroller.
+#
 
+#
+# These substitutions can be changed to faciliitate different languages or specific wording
+#
 substitutions:
-  # Idle state strings for local display [16 chars max]
+   # Idle state strings for local display [16 chars max]
    valves_idle_string: "All Valves OFF" 
+   # Valve name strings for local display
    valve_0_on_string: "Valve 0 ON" 
    valve_1_on_string: "Valve 1 ON" 
    valve_2_on_string: "Valve 2 ON" 
@@ -10,8 +17,32 @@ substitutions:
    valve_5_on_string: "Valve 5 ON" 
    valve_6_on_string: "Valve 6 ON" 
    valve_7_on_string: "Valve 7 ON" 
-   valve_8_on_string: "Valve 8 ON" 
-  
+   valve_8_on_string: "Valve 8 ON"
+   # Valve switch entity names
+   valve_0_switch_name: "Valve 0"
+   valve_1_switch_name: "Valve 1"
+   valve_2_switch_name: "Valve 2"
+   valve_3_switch_name: "Valve 3"
+   valve_4_switch_name: "Valve 4"
+   valve_5_switch_name: "Valve 5"
+   valve_6_switch_name: "Valve 6"
+   valve_7_switch_name: "Valve 7"
+   valve_8_switch_name: "Valve 8"
+   # Valve enable entity names
+   valve_0_enable_name: "Valve Enable 0"
+   valve_1_enable_name: "Valve Enable 1"
+   valve_2_enable_name: "Valve Enable 2"
+   valve_3_enable_name: "Valve Enable 3"
+   valve_4_enable_name: "Valve Enable 4"
+   valve_5_enable_name: "Valve Enable 5"
+   valve_6_enable_name: "Valve Enable 6"
+   valve_7_enable_name: "Valve Enable 7"
+   valve_8_enable_name: "Valve Enable 8"
+   
+#
+# globals
+#
+ 
 globals:
   - id: valves_status_string
     type: std::string
@@ -22,6 +53,10 @@ globals:
     type: std::string
     restore_value: no  
     initial_value: '"IDLE"'
+
+#
+# esphome
+#
 
 esphome:
   name: esp32-sprinkler
@@ -36,9 +71,11 @@ esphome:
       - delay: 2s
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
-      
-  
-    
+
+#
+# wifi
+# 
+   
 wifi:
   use_address: 192.168.31.224
   networks:
@@ -47,14 +84,23 @@ wifi:
     - ssid: !secret sec_wifi_ssid
       password: !secret sec_wifi_password
 
+#
+# webserver
+#
+
 web_server:
   port: 80
-  # https://esphome.io/components/web_server.html
+ 
+#
+# logger
+#
 
-
- # https://esphome.io/components/logger
 logger:
   level: INFO
+
+#
+# api
+#
 
 api:
   password: !secret esphome_api_password
@@ -62,9 +108,17 @@ api:
   reboot_timeout: 24h
 
 
+#
+# ota
+#
+
 ota:
   password: !secret esphome_ota_password
   # https://esphome.io/components/ota
+
+#
+# time
+#
 
 time:
   - platform: homeassistant
@@ -80,6 +134,11 @@ time:
   - platform: ds1307
     update_interval: never
     id: ds1307_time
+
+#
+#  external components
+#
+
  
 external_components:
   - source:
@@ -88,54 +147,58 @@ external_components:
   - source:
       type: local
       path:  custom_components/sprinkler
-  
  
-# Example minimal configuration entry
+#
+# sprinkler
+# 
+ 
 sprinkler:
   - id: sprinkler_ctrlr
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
     valves:
-      - valve_switch: "Valve 0"
-        enable_switch: "Enable Valve 0"
+      - valve_switch: "${valve_0_switch_name}"
+        enable_switch: "${valve_0_enable_name}"
         run_duration: 10s
         valve_switch_id: valve0
-      - valve_switch: "Valve 1"
-        enable_switch: "Enable Valve 1"
+      - valve_switch: "${valve_1_switch_name}"
+        enable_switch: "${valve_1_enable_name}"
         run_duration: 10s
         valve_switch_id: valve1
-      - valve_switch: "Valve 2"
-        enable_switch: "Enable Valve 2"
+      - valve_switch: "${valve_2_switch_name}"
+        enable_switch: "${valve_2_enable_name}"
         run_duration: 10s
         valve_switch_id: valve2
-      - valve_switch: "Valve 3"
-        enable_switch: "Enable Valve 3"
+      - valve_switch: "${valve_3_switch_name}"
+        enable_switch: "${valve_3_enable_name}"
         run_duration: 10s
         valve_switch_id: valve3
-      - valve_switch: "Valve 4"
-        enable_switch: "Enable Valve 4"
+      - valve_switch: "${valve_4_switch_name}"
+        enable_switch: "${valve_4_enable_name}"
         run_duration: 10s
         valve_switch_id: valve4
-      - valve_switch: "Valve 5"
-        enable_switch: "Enable Valve 5"
+      - valve_switch: "${valve_5_switch_name}"
+        enable_switch: "${valve_5_enable_name}"
         run_duration: 10s
         valve_switch_id: valve5
-      - valve_switch: "Valve 6"
-        enable_switch: "Enable Valve 6"
+      - valve_switch: "${valve_6_switch_name}"
+        enable_switch: "${valve_6_enable_name}"
         run_duration: 10s
         valve_switch_id: valve6
-      - valve_switch: "Valve 7"
-        enable_switch: "Enable Valve 7"
+      - valve_switch: "${valve_7_switch_name}"
+        enable_switch: "${valve_7_enable_name}"
         run_duration: 10s
         valve_switch_id: valve7
-      - valve_switch: "Valve 8"
-        enable_switch: "Enable Valve 8"
+      - valve_switch: "${valve_8_switch_name}"
+        enable_switch: "${valve_8_enable_name}"
         run_duration: 10s
         valve_switch_id: valve8
         
         
-
+#
 # 1602 LCD display
+#
+
 display:
   - platform: lcd_gpio
     id: the_display
@@ -165,16 +228,29 @@ display:
         else 
           // No valves open
           it.print(0, 1, id(to_string("${valves_idle_string}")));
+
+#
+# i2c
+#
+
+
 i2c:
   sda: 21
   scl: 22
   id: bus_a
 
+#
+# pca9554
+#
 
     
 pca9554:
     id: pca9554_valves_1_8
     address: 0x38 # For the PCA9554A part
+
+#
+# switch
+#
 
 switch:
   - platform: restart
@@ -375,6 +451,10 @@ switch:
         format: "Valve 8 turned off"
         level: "INFO"
 
+
+#
+# output
+#
    
 output:   
   # LCD backlight
@@ -393,7 +473,11 @@ output:
       mode:
         output: true
       inverted: false 
-   
+ 
+
+#
+# binary sensor
+# 
 
 binary_sensor:
   # Controller is running binary sensor
@@ -446,7 +530,9 @@ binary_sensor:
       then: 
         - output.turn_off: fault_led
        
-      
+#
+# sensor
+# 
    
 sensor:
     # Valve Current sensor
