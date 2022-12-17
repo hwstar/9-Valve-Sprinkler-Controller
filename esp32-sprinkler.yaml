@@ -1,5 +1,5 @@
 #
-# Example #1: Generic 9 valve example for the hwstar sprinkler conroller.
+# Example #1: Generic 8 valve  and 1 pump or master valve example for the hwstar sprinkler conroller.
 #
 
 #
@@ -7,19 +7,21 @@
 #
 substitutions:
    # Idle state strings for local display [16 chars max]
-   valves_idle_string: "All Valves OFF" 
-   # Valve name strings for local display
-   valve_0_on_string: "Valve 0 ON" 
-   valve_1_on_string: "Valve 1 ON" 
-   valve_2_on_string: "Valve 2 ON" 
+   valves_idle_string: "All Valves OFF"
+   # Valve name strings for local display [16 chars max]
+   valve_1_on_string: "Valve 1 ON"
+   valve_2_on_string: "Valve 2 ON"
    valve_3_on_string: "Valve 3 ON"
-   valve_4_on_string: "Valve 4 ON"    
-   valve_5_on_string: "Valve 5 ON" 
-   valve_6_on_string: "Valve 6 ON" 
-   valve_7_on_string: "Valve 7 ON" 
+   valve_4_on_string: "Valve 4 ON"
+   valve_5_on_string: "Valve 5 ON"
+   valve_6_on_string: "Valve 6 ON"
+   valve_7_on_string: "Valve 7 ON"
    valve_8_on_string: "Valve 8 ON"
+   
+   # Pump valve name
+   pump_valve_name: "Main/Pump Valve"
+  
    # Valve switch entity names
-   valve_0_switch_name: "Valve 0"
    valve_1_switch_name: "Valve 1"
    valve_2_switch_name: "Valve 2"
    valve_3_switch_name: "Valve 3"
@@ -28,8 +30,11 @@ substitutions:
    valve_6_switch_name: "Valve 6"
    valve_7_switch_name: "Valve 7"
    valve_8_switch_name: "Valve 8"
+   
+   # Pump valve enable name
+   pump_valve_enable_name: "Main/Pump Valve Enable"
+   
    # Valve enable entity names
-   valve_0_enable_name: "Valve Enable 0"
    valve_1_enable_name: "Valve Enable 1"
    valve_2_enable_name: "Valve Enable 2"
    valve_3_enable_name: "Valve Enable 3"
@@ -38,20 +43,127 @@ substitutions:
    valve_6_enable_name: "Valve Enable 6"
    valve_7_enable_name: "Valve Enable 7"
    valve_8_enable_name: "Valve Enable 8"
-   
+
+#
+# time
+#
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+  - platform: sntp
+    timezone: America/Los_Angeles
+    id: sntp_time
+    on_time_sync:
+      then:
+        - ds1307.write_time
+    #
+    # Watering program triggers
+    #
+
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 6
+        days_of_week: MON,THU
+        then:
+          - script.execute: watering_program_1
+          
+      - seconds: 0
+        minutes: 0
+        hours: 6
+        days_of_week: TUE,FRI
+        then:
+          - script.execute: watering_program_2
+
+  - platform: ds1307
+    update_interval: never
+    id: ds1307_time
+
+#
+# Buttons
+#
+
+button:
+  - platform: template
+    name: "Run Watering Program 1"
+    on_press:
+      - wait_until:
+           binary_sensor.is_off: sprinklers_running
+      - script.execute: watering_program_1
+  - platform: template
+    name: "Run Watering Program 2"
+    on_press:
+      - wait_until:
+           binary_sensor.is_off: sprinklers_running
+      - script.execute: watering_program_2
+
+#
+# Watering scripts
+#
+
+script:
+  - id: watering_program_1
+    then:
+      - sprinkler.clear_queued_valves:
+          id: sprinkler_ctrlr
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 1
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 2
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 3
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 4
+          run_duration: 10s
+      - sprinkler.start_from_queue:
+          id: sprinkler_ctrlr
+
+  - id: watering_program_2
+    then:
+      - sprinkler.clear_queued_valves:
+          id: sprinkler_ctrlr
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 5
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 6
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 7
+          run_duration: 10s
+      - sprinkler.queue_valve:
+          id: sprinkler_ctrlr
+          valve_number: 8
+          run_duration: 10s
+      - sprinkler.start_from_queue:
+          id: sprinkler_ctrlr
+
+
 #
 # globals
 #
- 
+
 globals:
   - id: valves_status_string
     type: std::string
-    restore_value: no  
+    restore_value: no
     initial_value: '"${valves_idle_string}"'
-    
+
   - id: run_state_string
     type: std::string
-    restore_value: no  
+    restore_value: no
     initial_value: '"IDLE"'
 
 #
@@ -74,8 +186,8 @@ esphome:
 
 #
 # wifi
-# 
-   
+#
+
 wifi:
   use_address: 192.168.31.224
   networks:
@@ -90,7 +202,7 @@ wifi:
 
 web_server:
   port: 80
- 
+
 #
 # logger
 #
@@ -116,30 +228,13 @@ ota:
   password: !secret esphome_ota_password
   # https://esphome.io/components/ota
 
-#
-# time
-#
 
-time:
-  - platform: homeassistant
-    id: homeassistant_time
-  
-  - platform: sntp
-    timezone: America/Los_Angeles
-    id: sntp_time 
-    on_time_sync:
-      then:
-        - ds1307.write_time
-    
-  - platform: ds1307
-    update_interval: never
-    id: ds1307_time
 
 #
 #  external components
 #
 
- 
+
 external_components:
   - source:
       type: local
@@ -147,54 +242,66 @@ external_components:
   - source:
       type: local
       path:  custom_components/sprinkler
- 
+
 #
 # sprinkler
-# 
- 
+#
+
 sprinkler:
   - id: sprinkler_ctrlr
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
+    valve_overlap: 5s
+    pump_start_valve_delay: 3s
+   
     valves:
-      - valve_switch: "${valve_0_switch_name}"
-        enable_switch: "${valve_0_enable_name}"
+      # This definition for valve 0 (main/pump valve)  has to be here or the other valve ID's will be off by 1.
+      - valve_switch: "${pump_valve_name}"
+        enable_switch: "${pump_valve_enable_name}"
         run_duration: 10s
         valve_switch_id: valve0
       - valve_switch: "${valve_1_switch_name}"
         enable_switch: "${valve_1_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve1
       - valve_switch: "${valve_2_switch_name}"
         enable_switch: "${valve_2_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve2
       - valve_switch: "${valve_3_switch_name}"
         enable_switch: "${valve_3_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve3
       - valve_switch: "${valve_4_switch_name}"
         enable_switch: "${valve_4_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve4
       - valve_switch: "${valve_5_switch_name}"
         enable_switch: "${valve_5_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve5
       - valve_switch: "${valve_6_switch_name}"
         enable_switch: "${valve_6_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve6
       - valve_switch: "${valve_7_switch_name}"
         enable_switch: "${valve_7_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve7
       - valve_switch: "${valve_8_switch_name}"
         enable_switch: "${valve_8_enable_name}"
         run_duration: 10s
+        pump_switch_id: valve0
         valve_switch_id: valve8
-        
-        
+
+
 #
 # 1602 LCD display
 #
@@ -225,7 +332,7 @@ display:
         if (id(sprinklers_running).state == true)
           // Controller running, so a valve should be open
           it.print(0, 1, id(valves_status_string));
-        else 
+        else
           // No valves open
           it.print(0, 1, id(to_string("${valves_idle_string}")));
 
@@ -243,7 +350,7 @@ i2c:
 # pca9554
 #
 
-    
+
 pca9554:
     id: pca9554_valves_1_8
     address: 0x38 # For the PCA9554A part
@@ -255,8 +362,8 @@ pca9554:
 switch:
   - platform: restart
     name: "Reboot Sprinkler Controller"
-  
-# Valve 0
+
+# Valve 0 - Pump or master valve
   - platform: gpio
     id: valve0
     pin:
@@ -265,19 +372,16 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
-        format: "Valve 0 turned on"
+    - logger.log:
+        format: "Pump Valve 0 on"
         level: "INFO"
-    - lambda: |-
-        id(valves_status_string) = to_string("${valve_0_on_string}");
-
     on_turn_off:
-    - logger.log: 
-        format: "Valve 0 turned off"
+    - logger.log:
+        format: "Pump Valve 0 off"
         level: "INFO"
-   
- 
-# Valve 1  
+
+
+# Valve 1
   - platform: gpio
     id: valve1
     pin:
@@ -287,18 +391,18 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 1 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_1_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 1 turned off"
         level: "INFO"
 
- # Valve 2      
+ # Valve 2
   - platform: gpio
     id: valve2
     pin:
@@ -308,19 +412,19 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 2 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_2_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 2 turned off"
         level: "INFO"
 
- 
- # Valve 3  
+
+ # Valve 3
   - platform: gpio
     id: valve3
     pin:
@@ -330,20 +434,20 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 3 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_3_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 3 turned off"
         level: "INFO"
-  
-      
-  
- # Valve 4    
+
+
+
+ # Valve 4
   - platform: gpio
     id: valve4
     pin:
@@ -360,10 +464,10 @@ switch:
         id(valves_status_string) = to_string("${valve_4_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 4 turned off"
         level: "INFO"
- 
+
  # Valve 5
   - platform: gpio
     id: valve5
@@ -374,19 +478,19 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 5 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_5_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 5 turned off"
         level: "INFO"
- 
-  
- # Valve 6 
+
+
+ # Valve 6
   - platform: gpio
     id: valve6
     pin:
@@ -396,14 +500,14 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 6 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_6_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 6 turned off"
         level: "INFO"
 
@@ -417,7 +521,7 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 7 turned on"
         level: "INFO"
     - lambda: |-
@@ -427,8 +531,8 @@ switch:
     - logger.log:
         format: "Valve 7 turned off"
         level: "INFO"
- 
-      
+
+
  # Valve 8
 
   - platform: gpio
@@ -440,14 +544,14 @@ switch:
         output: true
       inverted: false
     on_turn_on:
-    - logger.log: 
+    - logger.log:
         format: "Valve 8 turned on"
         level: "INFO"
     - lambda: |-
         id(valves_status_string) = to_string("${valve_8_on_string}");
 
     on_turn_off:
-    - logger.log: 
+    - logger.log:
         format: "Valve 8 turned off"
         level: "INFO"
 
@@ -455,8 +559,8 @@ switch:
 #
 # output
 #
-   
-output:   
+
+output:
   # LCD backlight
   - platform: gpio
     id: lcd_backlight
@@ -472,12 +576,12 @@ output:
       number: GPIO14
       mode:
         output: true
-      inverted: false 
- 
+      inverted: false
+
 
 #
 # binary sensor
-# 
+#
 
 binary_sensor:
   # Controller is running binary sensor
@@ -486,7 +590,7 @@ binary_sensor:
     name: "Sprinklers Running"
     lambda:
       return id(sprinkler_ctrlr).is_running();
-  
+
 
  # Button 1 - LCD backlight
   - platform: gpio
@@ -504,7 +608,7 @@ binary_sensor:
       then:
        -  delay: 30s
        -  output.turn_off: lcd_backlight
-      
+
 # Button 2
   - platform: gpio
     id: button2
@@ -515,8 +619,8 @@ binary_sensor:
       inverted: true
     filters:
       delayed_on_off: 10ms
-      
-# Button 3   - Clear fault 
+
+# Button 3   - Clear fault
   - platform: gpio
     id: button3
     pin:
@@ -527,13 +631,13 @@ binary_sensor:
     filters:
       delayed_on_off: 1s  #Must be pressed for 1 second
     on_press:
-      then: 
+      then:
         - output.turn_off: fault_led
-       
+
 #
 # sensor
-# 
-   
+#
+
 sensor:
     # Valve Current sensor
   - platform: adc
@@ -559,10 +663,9 @@ sensor:
             - sprinkler.shutdown: sprinkler_ctrlr
             - logger.log:
                 format:    "Overcurrent fault!"
-                level:  ERROR            
+                level:  ERROR
             - output.turn_on: fault_led
-          
-            
-  
-    
-    
+
+
+
+

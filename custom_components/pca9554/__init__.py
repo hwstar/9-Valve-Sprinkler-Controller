@@ -11,23 +11,23 @@ from esphome.const import (
     CONF_OUTPUT,
 )
 
+CODEOWNERS = ["@hwstar"]
 DEPENDENCIES = ["i2c"]
-MULTI_CONF = False
-
+MULTI_CONF = True
 pca9554_ns = cg.esphome_ns.namespace("pca9554")
 
 PCA9554Component = pca9554_ns.class_("PCA9554Component", cg.Component, i2c.I2CDevice)
-PCA9554GPIOPin = pca9554_ns.class_("PCA9554GPIOPin", cg.GPIOPin)
+PCA9554GPIOPin = pca9554_ns.class_(
+    "PCA9554GPIOPin", cg.GPIOPin, cg.Parented.template(PCA9554Component)
+)
 
 CONF_PCA9554 = "pca9554"
 CONFIG_SCHEMA = (
-    cv.Schema(
-        {
-            cv.Required(CONF_ID): cv.declare_id(PCA9554Component)
-        }
-    )
+    cv.Schema({cv.Required(CONF_ID): cv.declare_id(PCA9554Component)})
     .extend(cv.COMPONENT_SCHEMA)
-    .extend(i2c.i2c_device_schema(0x20)) #Note: 0x20 for the non-A part. The PCA9554A parts start at addess 0x38
+    .extend(
+        i2c.i2c_device_schema(0x20)
+    )  # Note: 0x20 for the non-A part. The PCA9554A parts start at addess 0x38
 )
 
 
