@@ -57,7 +57,10 @@ time:
     id: sntp_time
     on_time_sync:
       then:
-        - ds1307.write_time
+        #- ds1307.write_time
+        - lambda: |-
+            id(time_synchronized) = true;
+            
     #
     # Watering program triggers
     #
@@ -165,6 +168,11 @@ globals:
     type: std::string
     restore_value: no
     initial_value: '"IDLE"'
+    
+  - id: time_synchronized
+    type: bool
+    restore_value: no
+    initial_value: "false"
 
 #
 # esphome
@@ -177,10 +185,9 @@ esphome:
   on_boot:
     then:
       # LED test
-      - ds1307.read_time:
-      - output.turn_on: fault_led
       - output.turn_on: lcd_backlight
-      - delay: 2s
+      - delay: 10s
+      - ds1307.read_time:
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
 
@@ -251,7 +258,7 @@ sprinkler:
   - id: sprinkler_ctrlr
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
-    valve_overlap: 5s
+    valve_overlap: 3s
     pump_start_valve_delay: 3s
    
     valves:
@@ -326,7 +333,10 @@ display:
         strncpy(run_state_string, id(sprinkler_ctrlr).current_ctrlr_state_as_str().c_str(), 8);
         it.print(0, 0, run_state_string );
         // Print the current time
-        it.strftime(11, 0, "%H:%M", id(sntp_time).now());
+        if(id(time_synchronized) == true)
+          it.strftime(11, 0, "%H:%M", id(sntp_time).now());
+        else
+          it.print(11, 0, "--:--");
         // Line 1
         // Update current open valve
         if (id(sprinklers_running).state == true)
@@ -589,7 +599,7 @@ binary_sensor:
     id: sprinklers_running
     name: "Sprinklers Running"
     lambda:
-      return id(sprinkler_ctrlr).is_running();
+      return id(sprinkler_ctrlr).active_valve().has_value();
 
 
  # Button 1 - LCD backlight
@@ -629,7 +639,7 @@ binary_sensor:
         input: true
       inverted: true
     filters:
-      delayed_on_off: 1s  #Must be pressed for 1 second
+      delayed_on_off: 10ms 
     on_press:
       then:
         - output.turn_off: fault_led
@@ -638,8 +648,9 @@ binary_sensor:
 # sensor
 #
 
+
 sensor:
-    # Valve Current sensor
+# Valve Current sensor
   - platform: adc
     pin: GPIO36
     attenuation: auto
