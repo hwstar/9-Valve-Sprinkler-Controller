@@ -88,7 +88,7 @@ time:
     id: ds1307_time
 
 #
-# Buttons
+# Front end buttons
 #
 
 button:
@@ -614,7 +614,7 @@ binary_sensor:
       return id(sprinkler_ctrlr).active_valve().has_value();
 
 
- # Button 1 - LCD backlight
+ # Front panel button 1 - LCD backlight
   - platform: gpio
     id: button1
     pin:
@@ -631,7 +631,7 @@ binary_sensor:
        -  delay: 30s
        -  output.turn_off: lcd_backlight
 
-# Button 2
+# Front panel button 2 - Start a watering program
   - platform: gpio
     id: button2
     pin:
@@ -646,7 +646,7 @@ binary_sensor:
         - script.execute: watering_program_1
         
 
-# Button 3   - Clear fault/ ip address
+# Front panel button 3   - Clear fault/ show ip address
   - platform: gpio
     id: button3
     pin:
