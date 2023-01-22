@@ -211,8 +211,8 @@ esphome:
 
 wifi:
   networks:
-#    - ssid: !secret wifi_ssid
-#      password: !secret wifi_password
+   - ssid: !secret wifi_ssid
+     password: !secret wifi_password
   ap:
     # This is the fallback hotspot used to reconfigure the sprinkler 
     # controller when there are no valid WIFI credentials
