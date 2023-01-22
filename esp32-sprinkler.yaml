@@ -1,25 +1,32 @@
 #
-# Example #1: Generic 8 valve  and 1 pump or master valve example for the hwstar sprinkler conroller.
+# Example ESPhome YAML file for the sprinkler controller
 #
 
-#
-# These substitutions can be changed to faciliitate different languages or specific wording
-#
 substitutions:
+   # Sprinkler controller name
+   sprinkler_controller_name: "sprinkler_controller" # Note: must match name used in external_components/valve_dog/valve_dog.h
+   
+   # Auto off string for local display  [8 chars max]
+   auto_off_string: "AUTO OFF"
+   
+   # Rain sting for local display [8 chars max]
+   rain_string: "RAIN"
+
    # Idle state strings for local display [16 chars max]
    valves_idle_string: "All Valves OFF"
+
    # Valve name strings for local display [16 chars max]
    valve_1_on_string: "Valve 1 ON"
    valve_2_on_string: "Valve 2 ON"
    valve_3_on_string: "Valve 3 ON"
-   valve_4_on_string: "Valve 4 ON"
+   valve_4_on_string: "Valve 3 ON"
    valve_5_on_string: "Valve 5 ON"
    valve_6_on_string: "Valve 6 ON"
    valve_7_on_string: "Valve 7 ON"
    valve_8_on_string: "Valve 8 ON"
    
    # Pump valve name
-   pump_valve_name: "Main/Pump Valve"
+   pump_valve_name: "Master Valve"
   
    # Valve switch entity names
    valve_1_switch_name: "Valve 1"
@@ -44,6 +51,7 @@ substitutions:
    valve_7_enable_name: "Valve Enable 7"
    valve_8_enable_name: "Valve Enable 8"
 
+
 #
 # time
 #
@@ -61,102 +69,84 @@ time:
         - logger.log:
             level: INFO
             format:  "Time synchronized. Wrote time to DS1307"
-        - lambda: |-
-            id(time_synchronized) = true;
-            
+   
+  - platform: ds1307
+    update_interval: never
+    id: ds1307_time
+    
+    # Use the DS3107 time to trigger watering programs
+    
     #
     # Watering program triggers
     #
 
     on_time:
+      # Midnight housekeeping trigger
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        then:
+          - lambda: |-
+              id(is_raining) = false;
+            
+      # Example Watering program # 1  trigger
+      
       - seconds: 0
         minutes: 0
         hours: 6
         days_of_week: MON,THU
         then:
-          - script.execute: watering_program_1
-          
-      - seconds: 0
-        minutes: 0
-        hours: 6
-        days_of_week: TUE,FRI
-        then:
-          - script.execute: watering_program_2
-
-  - platform: ds1307
-    update_interval: never
-    id: ds1307_time
+          - if:
+              condition: # Check for watering script enable and not raining before running the script
+                lambda:  |-
+                  return (id( automatic_watering_enable ) && !id(is_raining));
+              then:
+                - script.execute: watering_program_1
+ 
+      # More triggers can be added here.
 
 #
 # Front end buttons
 #
 
 button:
+  # Run watering program 1
   - platform: template
     name: "Run Watering Program 1"
     on_press:
       - wait_until:
            binary_sensor.is_off: sprinklers_running
       - script.execute: watering_program_1
+   # Shut them all down 
   - platform: template
-    name: "Run Watering Program 2"
+    name: "Stop All Sprinklers"
     on_press:
-      - wait_until:
-           binary_sensor.is_off: sprinklers_running
-      - script.execute: watering_program_2
-
+      - sprinkler.shutdown: "${sprinkler_controller_name}"
+ 
 #
-# Watering scripts
+# Scripts
 #
 
 script:
+  # Example watering script (called from time trigger above)
   - id: watering_program_1
     then:
       - sprinkler.clear_queued_valves:
-          id: sprinkler_ctrlr
+          id: "${sprinkler_controller_name}"
       - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
+          id: "${sprinkler_controller_name}"
           valve_number: 1
           run_duration: 30s
       - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
+          id: "${sprinkler_controller_name}"
           valve_number: 2
           run_duration: 30s
       - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
-          valve_number: 3
-          run_duration: 30s
-      - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
+          id: "${sprinkler_controller_name}"
           valve_number: 4
           run_duration: 30s
       - sprinkler.start_from_queue:
-          id: sprinkler_ctrlr
-
-  - id: watering_program_2
-    then:
-      - sprinkler.clear_queued_valves:
-          id: sprinkler_ctrlr
-      - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
-          valve_number: 5
-          run_duration: 30s
-      - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
-          valve_number: 6
-          run_duration: 30s
-      - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
-          valve_number: 7
-          run_duration: 30s
-      - sprinkler.queue_valve:
-          id: sprinkler_ctrlr
-          valve_number: 8
-          run_duration: 30s
-      - sprinkler.start_from_queue:
-          id: sprinkler_ctrlr
-
-
+          id: "${sprinkler_controller_name}"
 #
 # globals
 #
@@ -172,30 +162,46 @@ globals:
     restore_value: no
     initial_value: '"IDLE"'
     
-  - id: time_synchronized
-    type: bool
-    restore_value: no
-    initial_value: "false"
-    
   - id: display_ip_address
     type: bool
     restore_value: no
     initial_value: "false"
+    
+  - id: automatic_watering_enable  # Automatic watering enable/disable
+    type: bool
+    restore_value: yes
+    initial_value: "true"
+    
+  - id: is_raining  # Is raining
+    type: bool
+    restore_value: no
+    initial_value: "false"
+    
+  - id: has_fault  # Has fault flag
+    type: bool
+    restore_value: no
+    initial_value: "false"
+    
 
 #
 # esphome
 #
 
 esphome:
-  name: esp32-sprinkler-dev
+  name: esp32-sprinkler
   platform: ESP32
   board: esp32dev
+  includes:
+    - external_components/valve_dog/valve_dog.h
   on_boot:
     then:
+      # Read time from RTC so we have something to start with while we get time form the network.
+      # RTC will be updated periodically with time from the Internet
+      # or Home Assistant if there is a network connection.
+      - ds1307.read_time:
       # LED test
       - output.turn_on: lcd_backlight
       - delay: 10s
-      - ds1307.read_time:
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
 
@@ -204,13 +210,16 @@ esphome:
 #
 
 wifi:
-  use_address: 192.168.31.205  # Dev
-  #use_address: 192.168.31.253 # Prod
   networks:
-    - ssid: !secret wifi_ssid
-      password: !secret wifi_password
-    - ssid: !secret sec_wifi_ssid
-      password: !secret sec_wifi_password
+#    - ssid: !secret wifi_ssid
+#      password: !secret wifi_password
+  ap:
+    # This is the fallback hotspot used to reconfigure the sprinkler 
+    # controller when there are no valid WIFI credentials
+    ssid: "Sprinkler Controller Hotspot"
+    password: a_long_password
+
+captive_portal:
 
 #
 # webserver
@@ -218,6 +227,9 @@ wifi:
 
 web_server:
   port: 80
+# auth:
+#    username: admin
+#    password: !secret wifi_password
 
 #
 # logger
@@ -232,10 +244,24 @@ logger:
 
 api:
   password: !secret esphome_api_password
-  # https://esphome.io/components/api
   reboot_timeout: 24h
-
-
+#  encryption:
+#          key: !secret api_key
+   # Exposed services
+  services:
+    - service: set_multiplier # Set watering multiplier
+      variables:
+        multiplier: float
+      then:
+        - sprinkler.set_multiplier: 
+            id: "${sprinkler_controller_name}"
+            multiplier: !lambda 'return multiplier;'
+    - service: force_shutdown  # Shut down any running sprinklers
+      then:
+        - sprinkler.shutdown: "${sprinkler_controller_name}"         
+        - logger.log:
+            level: INFO
+            format:  "Shutdown service call received"
 #
 # ota
 #
@@ -244,8 +270,16 @@ ota:
   password: !secret esphome_ota_password
   # https://esphome.io/components/ota
 
-
-
+#
+# custom components
+#
+custom_component:
+  #
+  # Valve watchdog
+  #
+- lambda: |-
+    auto valve_dog = new ValveDog();
+    return {valve_dog};
 #
 #  external components
 #
@@ -261,7 +295,7 @@ external_components:
 #
 
 sprinkler:
-  - id: sprinkler_ctrlr
+  - id: "${sprinkler_controller_name}"
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
     valve_overlap: 3s
@@ -336,11 +370,18 @@ display:
         // Current run state
         char run_state_string[9];
         run_state_string[8] = 0;
-        strncpy(run_state_string, id(sprinkler_ctrlr).current_ctrlr_state_as_str().c_str(), 8);
+        // Print state, rain, or auto off string
+        if(((id(automatic_watering_enable) == false) || (id(is_raining) == true )) && (id(sprinklers_running).state == false))
+          if(id(is_raining) == true)
+            strcpy(run_state_string, "${rain_string}");
+          else
+            strcpy(run_state_string, "${auto_off_string}");
+        else
+          strncpy(run_state_string, id(${sprinkler_controller_name}).current_ctrlr_state_as_str().c_str(), 8);
         it.print(0, 0, run_state_string );
         // Print the current time
-        if(id(time_synchronized) == true)
-          it.strftime(11, 0, "%H:%M", id(sntp_time).now());
+        if(id(ds1307_time).is_failed() == false)
+          it.strftime(11, 0, "%H:%M", id(ds1307_time).now());
         else
           it.print(11, 0, "--:--");
         // Line 1
@@ -384,6 +425,43 @@ pca9554:
 switch:
   - platform: restart
     name: "Reboot Sprinkler Controller"
+  
+  - platform: template
+    name: "Sprinkler Automatic Watering Enable"
+    lambda: |-
+       return ( id(automatic_watering_enable) );
+    turn_on_action:
+      - lambda: |-
+           id(automatic_watering_enable) = true;
+      - logger.log:
+           format: "Automatic watering enabled"
+           level: "INFO"
+         
+    turn_off_action:
+       - lambda: |-
+           id(automatic_watering_enable) = false;
+       - logger.log:
+           format: "Automatic watering disabled"
+           level: "INFO"
+           
+  - platform: template
+    name: "Sprinkler Rain Disable Switch"
+    lambda: |-
+       return ( id(is_raining) );
+    turn_on_action:
+      - lambda: |-
+           id(is_raining) = true;
+      - logger.log:
+           format: "It is raining"
+           level: "INFO"
+         
+    turn_off_action:
+       - lambda: |-
+           id(is_raining) = false;
+       - logger.log:
+           format: "It is not raining"
+           level: "INFO"
+         
 
 # Valve 0 - Pump or master valve
   - platform: gpio
@@ -606,15 +684,24 @@ output:
 #
 
 binary_sensor:
+  # Overcurrent fault
+  - platform: template
+    device_class: problem
+    id: has_overcurrent_fault
+    name: "Has Overcurrent Fault"
+    lambda:
+      return id(has_fault);
+
   # Controller is running binary sensor
   - platform: template
+    device_class: running
     id: sprinklers_running
     name: "Sprinklers Running"
     lambda:
-      return id(sprinkler_ctrlr).active_valve().has_value();
+      return id(${sprinkler_controller_name}).active_valve().has_value();
 
 
- # Front panel button 1 - LCD backlight
+ # Front panel button 1 - LCD backlight/Start Watering program
   - platform: gpio
     id: button1
     pin:
@@ -624,14 +711,23 @@ binary_sensor:
       inverted: true
     filters:
       delayed_on_off: 10ms
-    on_press:
-      output.turn_on: lcd_backlight
-    on_release:
-      then:
-       -  delay: 30s
-       -  output.turn_off: lcd_backlight
+    on_click:
+      - min_length: 50ms
+        max_length: 350ms
+        then:
+          - output.turn_on: lcd_backlight
+          - delay: 30s
+          - output.turn_off: lcd_backlight
+      - min_length: 500ms
+        max_length: 2000ms
+        then:
+          - logger.log:
+              format:    "Watering program 1 started from local button"
+              level:  INFO
+          - script.execute: watering_program_1
+     
 
-# Front panel button 2 - Start a watering program
+# Front panel button 2 - Stop all watering programs
   - platform: gpio
     id: button2
     pin:
@@ -641,9 +737,15 @@ binary_sensor:
       inverted: true
     filters:
       delayed_on_off: 10ms
-    on_press:
-      then:
-        - script.execute: watering_program_1
+    on_click:
+      - min_length: 500ms
+        max_length: 2000ms
+        then:
+          - logger.log:
+              format:    "Watering stopped from local button"
+              level:  INFO
+          - sprinkler.shutdown: "${sprinkler_controller_name}"
+       
         
 
 # Front panel button 3   - Clear fault/ show ip address
@@ -660,6 +762,7 @@ binary_sensor:
       then:
         - output.turn_off: fault_led
         - lambda: |-
+            id(has_fault) = false;
             id(display_ip_address) = true;
     on_release:
       then:
@@ -686,28 +789,29 @@ sensor:
         # convert Apk to Arms
       - lambda: |-
           float a = (x/2.02)*0.707;
-          // Temporary clip to 0  until ESP32 devices received with factory ADC calibration.
           if (a < 0.08)
             return 0.0;
           else
             return a;
     on_value_range:
-        - above: 0.8
+        - above: 1.0 # 1 Amp. A reasonable value when 3 valves are on at the same time
           then:
-            - sprinkler.shutdown: sprinkler_ctrlr
+            - sprinkler.shutdown: "${sprinkler_controller_name}"
             - logger.log:
                 format:    "Overcurrent fault!"
                 level:  ERROR
             - output.turn_on: fault_led
+            - lambda: |-
+                id(has_fault) = true;
 #
 # Text Sensor
 #
             
 text_sensor:
+  # Local text sensor to allow the display to show the IP Address
   - platform: wifi_info
     ip_address: 
       id: our_ip_address
-      name: "Our IP Address"
     
 
 
