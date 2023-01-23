@@ -195,7 +195,7 @@ esphome:
     - external_components/valve_dog/valve_dog.h
   on_boot:
     then:
-      # Read time from RTC so we have something to start with while we get time form the network.
+      # Read time from RTC so we have something to start with while we get time from the network.
       # RTC will be updated periodically with time from the Internet
       # or Home Assistant if there is a network connection.
       - ds1307.read_time:
