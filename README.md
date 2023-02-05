@@ -9,7 +9,7 @@ controller based on an ESP32. It has the following features:
 * Optional 1602 LCD display.
 * Optional Front panel buttons.
 * Real time clock.
-* Individual triac valve drivers rated for 0.5A each.
+* Individual triac valve drivers.
 * Monitoring of the total valve current.
 * Watchdog relay disconnects all valves if not serviced periodically.
 * Expansion connector for future valve expanders.
@@ -37,7 +37,7 @@ There is one external_component located in the /external_components directory. T
 
 ### Serial Connector
 
-The Serial connector J301 is pinned out to accept an FTDI cable. It is a 1x6 2.54mm pitch header located to the right of the ESP32 board. The serial connector is used to upload firmware to the Sprikler controller should the OTA programming fail.  The pinout of this connector is:
+The Serial connector J301 is pinned out to accept an FTDI cable. It is a 1x6 2.54mm pitch header located to the right of the ESP32 board. The serial connector is used to upload firmware to the Sprinkler controller should the OTA programming fail.  The pinout of this connector is:
 
 
 #### Table 1. FTDI Connector
