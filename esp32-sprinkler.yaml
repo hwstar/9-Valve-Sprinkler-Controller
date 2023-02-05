@@ -243,7 +243,6 @@ logger:
 #
 
 api:
-  password: !secret esphome_api_password
   reboot_timeout: 24h
 #  encryption:
 #          key: !secret api_key

@@ -1,4 +1,3 @@
 __pycache__/
 secrets.yaml
 .esphome/
-/custom_components
