@@ -11,11 +11,29 @@ controller based on an ESP32. It has the following features:
 * Real time clock.
 * Individual triac valve drivers rated for 0.5A each.
 * Monitoring of the total valve current.
-* Safety watchdog relay to help prevent overwatering if the code stops running.
+* Watchdog relay disconnects all valves if not serviced periodically.
 * Expansion connector for future valve expanders.
 * Board Fits in a plastic PLC06 case available on ALIEXPRESS.
 
-## Hardware Description
+The hardware is primarily designed to work with [ESPHome](https://github.com/esphome/esphome). 
+
+## Software
+
+### ESPHOME yaml file 
+
+An example YAML file is provided to aid in the implementation of the sprinkler controller. It contains lots of examples on how to do things with the hardware.
+
+### Custom components
+
+3 Custom components are located in the /custom_components directory. They are for support of the display, the PCA9554, and a modified version of the ESPHome sprinkler controller component.
+Some of these components may get removed when they are integrated into ESPHome or are otherwise no longer required.
+
+### External Component
+
+There is one external_component located in the /external_components directory. This external component controls the Valve watchdog relay.
+
+
+## Hardware
 
 ### Serial Connector
 
@@ -50,6 +68,11 @@ The expansion connector J201 is an 8 pin 3mm pitch Molex micro fit connector (43
 | 7 | I2C SDA |
 | 8 | DC Ground |
 
+
+### Real Time Clock Jumper
+
+J302 on the board can be in one of 2 positions. In position 1-2, the battery is connected to the DS1307 clock. In position 2-3 The DS1307 battery input is grounded. The board is shipped with the jumper in positions 2-3. 
+To fully utilize the DS1307, a CR927 battery (not-supplied) must be inserted, and the the jumper must be moved to positions 1-2.
 
 
 ### I2C Bus
@@ -106,6 +129,14 @@ The 3 momentary buttons are connected directly to the ESP32. With associated def
 |GPIO34| Button 3 (Bottom)       |
 |GPIO0 | Boot (Internal Only)    |
 
+### Watchdog Relay
+
+The watchdog relay will disconnect all the valves if no output toggling is detected on GPIO16. There is an external component called valve_dog.h which toggles GPIO16 each time the loop function is called.
+If this output stops toggling, the valves will be disconnected from the 24VAC power source. According to the ESPHome docs, the setup method in valve_dog.h is called at approximately a 60Hz rate. There is a charge pump on the board connected to a MOSFET which drives the watchdog relay. If the input to the charge pump stops toggling, then the relay opens.
+
+In the .yaml code example and in valve_dog.h the state of the irrigation controller is monitored. If it isn't active, then no toggling will appear on the output of GPIO16, and the relay contacts will be open. Once the irrigation controller becomes active, toggling will appear on GPIO16 and a short time later, the relay will close. This will ususally happen in 1-2 seconds, so that should be factored into the sprinkler controller start delay time.
+
+Note: If you want to change the name of the sprinkler controller, you'll also need to edit valve_dog.h so it knows the name of the controller to monitor the active flag. Please refer to the notes in the source files for details.
 
 
 
