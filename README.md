@@ -71,7 +71,7 @@ Found multiple options, please choose one:
 
 ```
 
-Whan prompted for upload options, choose option 1.
+When prompted for upload options, choose option 1.
 
 
 ### ESPHOME yaml file 
