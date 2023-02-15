@@ -51,7 +51,7 @@ the red LED lights, release the EN switch. The red LED should stay lit if this i
 
 The board is now ready to a accept firmware upload via the serial cable.
 
-To comple the firmware, make sure you have renamed and modified secrets-sample.conf to secrets.conf, then run the following command in the build directory:
+To compile the firmware, make sure you have renamed and modified secrets-sample.conf to secrets.conf, then run the following command in the build directory:
 
 ```
 esphome run esp32-sprinkler.yaml
@@ -72,6 +72,17 @@ Found multiple options, please choose one:
 ```
 
 When prompted for upload options, choose option 1.
+
+Once the firmware completes loading. Press the EN button to reboot. The display should now show status.
+
+If you wait 30 seconds after boot then press and hold B3, then the IP address of the controller will be displayed on the second line of the display as long as B3 remains pressed.
+
+Using the IP address you can view the status of the sprinkler controller by using a web browser.
+
+Once your firmware is loaded and runnng correctly, you can also do Over-The-Air Firmware updates from this point forward.
+
+At this point, check Homeassistant to see if the Sprinkler controller shows up as a new device.
+
 
 
 ### ESPHOME yaml file 
