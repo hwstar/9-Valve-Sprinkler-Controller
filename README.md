@@ -53,9 +53,26 @@ The board is now ready to a accept firmware upload via the serial cable.
 
 To comple the firmware, make sure you have renamed and modified secrets-sample.conf to secrets.conf, then run the following command in the build directory:
 
-'''
-esphome run esp32-
-''' 
+```
+esphome run esp32-sprinkler.yaml
+```
+
+You should then see something like:
+
+```
+.
+.
+.
+========================= [SUCCESS] Took 18.63 seconds =========================
+INFO Successfully compiled program.
+Found multiple options, please choose one:
+  [1] /dev/ttyUSB0 (FT232R USB UART - FT232R USB UART)
+  [2] Over The Air (esp32-sprinkler.local)
+
+```
+
+Whan prompted for upload options, choose option 1.
+
 
 ### ESPHOME yaml file 
 
