@@ -18,8 +18,18 @@
 #define DOG_PIN 16
 
 class ValveDog : public Component {
+  
+ protected:
+   sprinkler::Sprinkler *sprc_obj;
+  
  public:
-
+    
+  // Constructor
+  ValveDog(sprinkler::Sprinkler *sc_obj){
+    this->sprc_obj = sc_obj;
+  }
+    
+    
   void setup() override {
     // Called once
     this->pin_state = false;
@@ -32,10 +42,8 @@ class ValveDog : public Component {
 
   void loop() override {
     // Called repeatedly at appx. 60Hz
-    
-    // Note: Ensure that the name sprinkler_controller is the same one used in the yaml file
 
-    if(id(sprinkler_controller).active_valve().has_value()){ // Sprinkler controller must be active
+    if(this->sprc_obj->active_valve().has_value()){ // Sprinkler controller must be active
           // Toggle the valve watchdog pin if enabled
           pin_state = !pin_state;
           digitalWrite(DOG_PIN, pin_state);
