@@ -6,10 +6,10 @@ controller based on an ESP32. It has the following features:
 * Uses a 40VA 24VAC wall transformer with an internal fuse.
 * Operates the 24 Volt AC sprinkler valves commonly used for irrigation.
 * 9 Indpendently controllable valve outputs.
-* Optional 1602 LCD display.
-* Optional Front panel buttons.
+* 1602 LCD display.
+* 3 Front panel buttons.
 * Real time clock.
-* Individual triac valve drivers.
+* Individual triac valve drivers rated for 0.4A.
 * Monitoring of the total valve current.
 * Watchdog relay disconnects all valves if not serviced periodically by the firmware.
 * Expansion connector for future valve expanders.
