@@ -15,7 +15,7 @@ controller based on an ESP32. It has the following features:
 * Expansion connector for future valve expanders.
 * Plastic Enclosure and graphic overlay.
 
-The hardware is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware.
+The hardware is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
 
 ## Disclaimer
 
@@ -92,7 +92,7 @@ This file can be used as the basis for your customized yaml file.
 
 ### Custom components
 
-3 Custom components are located in the /custom_components directory. They are for support of the display, the PCA9554, and a modified version of the ESPHome sprinkler controller component.
+2 Custom components are located in the /custom_components directory. They are for support of the display, and a modified version of the ESPHome sprinkler controller component.
 Some of these components may get removed when they are integrated into ESPHome or are otherwise no longer required. No modification of these custom components should be necessary, but they must
 be present when the firmware is compiled, or there will be compile errors.
 

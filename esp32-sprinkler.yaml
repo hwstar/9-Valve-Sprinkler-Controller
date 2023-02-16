@@ -285,7 +285,7 @@ external_components:
   - source:
       type: local
       path: custom_components
-    components: [ "pca9554", "sprinkler", "lcd_base" ]
+    components: [ "sprinkler", "lcd_base" ]
 #
 # sprinkler
 #
