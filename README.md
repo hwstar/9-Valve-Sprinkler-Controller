@@ -87,23 +87,18 @@ Not supplied in the kit:
 Please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki] for this reference information
 
 
-### Power Connector
+### Power Valve and Serial Connectors
+
+The picture below shows the location of the power, valve and serial connectors.
+
+![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/assets/scm9-power-valves-serial.png)
 
 The 2 pin power connector J402 accepts 22-28VAC power at 60Hz from a 40VA wall transformer with an internal fuse (IMPORTANT!). A suitable transformer can be found [here](https://www.amazon.com/Transformer-Auto-resetting-Compatible-Doorbell%EF%BC%8CNest-Thermostat/dp/B085WPNC29)
 
+Note: The valves used must not draw more than 0.4 amps each. Do not put more then 1 valve on a valve output pin.
 
-### Valve Connector
+The Serial connector J301 is pinned out to accept an FTDI cable. It is a 1x6 2.54mm pitch header located to the right of the ESP32 module. The serial connector is used to initially upload firmware to the Sprinkler controller 
 
-J401 is the valve connector. It has the following pinout:
-
-### Table 1. Valve Connector
-
-Note: The valves used must not draw more than 0.4 amps each. Do not put more then 1 valve on a valve driver.
-
-### Serial Connector
-
-
-The Serial connector J301 is pinned out to accept an FTDI cable. It is a 1x6 2.54mm pitch header located to the right of the ESP32 board. The serial connector is used to upload firmware to the Sprinkler controller should the OTA programming fail.  The pinout of this connector is:
 
 ### Expansion Connector
 
