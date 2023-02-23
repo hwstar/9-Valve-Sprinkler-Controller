@@ -72,14 +72,15 @@ Hardware included in the kit:
 
 1. 1 ea. Main PCB and display
 2. 1 ea. Pre-drilled enclosure and front panel overlay with 4 retaining screws.
+3. 1 ea. 2 pin screw terminal pluggable power connector.
+4. 1 ea. 12 pin screw terminal pluggable power connector.
 
 Not supplied in the kit:
 
 1. CR927 battery for the real time clock.
-
-2. 3.3V serial adapter for flashing firmware onto the board and connecting wires.
-
+2. 3.3V serial adapter for flashing firmware onto the board and connecting cable.
 3. 24V 40VA transformer
+4. Wire
 
 
 ### Connectors Pinouts and GPIO's
@@ -91,7 +92,7 @@ Please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controlle
 
 The picture below shows the location of the power, valve and serial connectors.
 
-![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/assets/scm9-power-valves-serial.png)
+![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/scm9-power-valves-serial.png)
 
 The 2 pin power connector J402 accepts 22-28VAC power at 60Hz from a 40VA wall transformer with an internal fuse (IMPORTANT!). A suitable transformer can be found [here](https://www.amazon.com/Transformer-Auto-resetting-Compatible-Doorbell%EF%BC%8CNest-Thermostat/dp/B085WPNC29)
 
