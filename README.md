@@ -24,7 +24,7 @@ By purchasing and/or using the hardware, you you indicate you are using it at yo
 
 ## Audience
 
-The controller is shipped without firmware which con connect to your WIFI network, and will require some firmware programming and electrical knowledge to successfully implement. 
+The controller is shipped without firmware which can connect to your WIFI network. It will require some firmware programming and electrical knowledge to successfully implement. 
 One should have some experience modifying esphome yaml files, reading wiring diagrams, using a Windows or Linux command line shell, using serial devices such as the FTDI serial cable,
 and using the esphome tool to program esphome devices. If you are not sure how to program firmware into an esphome device, please study the documentation on esphome.com and become
 familiar with it before purchasing a board. A link to the the programming documentation can be found [here](https://esphome.io/guides/cli.html)
@@ -85,10 +85,10 @@ Not supplied in the kit:
 
 ### Connectors Pinouts and GPIO's
 
-Please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki] for this reference information
+Please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki] for this reference information.
 
 
-### Power Valve and Serial Connectors
+### Power, Valve, and Serial Connectors
 
 The picture below shows the location of the power, valve and serial connectors.
 
@@ -114,34 +114,6 @@ in positions 2-3.
 
 Note: If the jumper is removed or missing, the battery input to the DS1307 will be left floating, and the DS1307 may not be able to be properly accessed via the software.
 
-
-### I2C Bus
-
-
-9 Triacs are used to switch the solenoid valves. 8 of these triac drivers  valves 1 through 9 are controlled by a single PCA9554 at I2C address 0x38 (Valve 0 output is directly connected to GPIO19). The PCA9554 is attached to I2C bus A. GPIO22 is the SCL signal, and GPIO21 is the SDA signal. The DS1307 is attached to the I2C bus, and is at address 0x68. The I2C bus also goes to the expansion connector for future valve expansion.
-
-#### Table 4. I2C Addresses
-
-|Device Address|Device|
-|--------------|------------------------------|
-|0x38          | PCA9554 IO Expander          |
-|0x68          | DS1307 Real Time Clock       |
-
-#### Table 5. PCA9554 I2C Address Solder Jumpers
-|SJ401|SJ402|SJ403|I2C Device Address|
-|-----|-----|-----|------------------|
-| -   | -   | -   | 0x38 (default)   |
-| -   | -   | X   | 0x39             |
-| -   | X   | -   | 0x3A             |
-| -   | X   | X   | 0x3B             |
-| X   | -   | -   | 0x3C             |
-| X   | -   | X   | 0x3D             |
-| X   | X   | -   | 0x3E             |
-| X   | X   | X   | 0x3F             |
-
-'X' Denotes a solder bridge
-
-The I2C address of the master controller need to remain at the default of 0x38. The other addresses will be used with valve expanders, should they be developed in the future.
 
 ### Display
 
@@ -176,24 +148,6 @@ Please note that the ESP32 ADC is not very linear bottom end of its range. The c
             return x;
 ```
 
-### Valve Drivers
-
-There are 9 valve drivers on the board. Valve zero is controlled by GPIO19 directly from the ESP32 chip. The other valves are accessed over I2C using the PCA9554 I2C expander. 
-
-For the valves controlled over I2C, the following table shows how the bit number (0-7) map to a specific valve:
-
-#### Table 8. I2C Bit to Valve mapping
-
-|BIT| Valve Number|
-|---| ------------|
-| 0 | Valve 1|
-| 1 | Valve 2|
-| 2 | Valve 3|
-| 3 | Valve 4|
-| 4 | Valve 5|
-| 5 | Valve 6|
-| 6 | Valve 7|
-| 7 | Valve 8|
 
 
 
