@@ -1,5 +1,7 @@
 # 9 Valve Sprinkler controller
 
+![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/proto-pic.png)
+
 This is the code and documentation repository for a 9 valve sprinkler
 controller based on an ESP32. It has the following features:
 
@@ -15,6 +17,8 @@ controller based on an ESP32. It has the following features:
 * Watchdog relay disconnects all valves if not serviced periodically by the firmware.
 * Expansion connector for future valve expanders.
 * Plastic Enclosure and graphic overlay.
+
+
 
 The hardware is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
 
