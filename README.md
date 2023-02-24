@@ -1,4 +1,4 @@
-# 9 Valve Sprinkler controller
+# 9 Valve Sprinkler Controller
 
 ![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/proto-pic.png)
 
