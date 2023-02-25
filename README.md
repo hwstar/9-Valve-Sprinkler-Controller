@@ -2,6 +2,9 @@
 
 ![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/proto-pic.png)
 
+![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/made-for-esphome-black-on-white.png)
+
+
 This is the code and documentation repository for a 9 valve sprinkler
 controller based on an ESP32. It has the following features:
 
