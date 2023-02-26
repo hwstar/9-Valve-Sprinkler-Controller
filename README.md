@@ -1,5 +1,7 @@
 # 9 Valve Sprinkler Controller
 
+![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/logo.png)
+
 ![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/proto-pic.png)
 
 ![alt text](https://github.com/hwstar/9-Valve-Sprinkler-Controller/blob/main/assets/made-for-esphome-black-on-white.png)
