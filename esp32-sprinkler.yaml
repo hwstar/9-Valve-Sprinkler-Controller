@@ -11,6 +11,9 @@ substitutions:
 
    # Idle state strings for local display [16 chars max]
    valves_idle_string: "All Valves OFF"
+   
+   # No WIFI Connection strinf [16 chars max]
+   no_wifi_string: "No WIFI Conn!"
 
    # Valve name strings for local display [16 chars max]
    valve_1_on_string: "Valve 1 ON"
@@ -179,6 +182,16 @@ globals:
     restore_value: no
     initial_value: "false"
     
+  - id: wifi_connection_state  # WIFI connection state flag
+    type: bool
+    restore_value: no
+    initial_value: "false"
+    
+  - id: display_passthrough_counter
+    type: int
+    restore_value: no
+    initial_value: "0"
+    
 
 #
 # esphome
@@ -297,6 +310,21 @@ external_components:
       type: local
       path: custom_components
     components: [ "sprinkler", "lcd_base" ]
+    
+    
+interval:
+  - interval: 1s
+    then:
+      if:
+        condition:
+          wifi.connected:
+        then:
+          - lambda: |-
+              id(wifi_connection_state) = true;
+        else:
+          - lambda: |-
+              id(wifi_connection_state) = false;
+            
 #
 # sprinkler
 #
@@ -373,6 +401,7 @@ display:
     rs_pin: GPIO17
     # this lambda is required. If it is missing esphome will go into a boot loop.
     lambda: |-
+        id(display_passthrough_counter)++;
         // Line 0
         // Current run state
         char run_state_string[9];
@@ -385,25 +414,51 @@ display:
             strcpy(run_state_string, "${auto_off_string}");
         else
           strncpy(run_state_string, id(sprinkler_controller).current_ctrlr_state_as_str().c_str(), 8);
+        // Line 0
         it.print(0, 0, run_state_string );
         // Print the current time
         if(id(ds1307_time).is_failed() == false)
           it.strftime(11, 0, "%H:%M", id(ds1307_time).now());
         else
           it.print(11, 0, "--:--");
-        // Line 1
+       
         if (id(display_ip_address) == true){
           std::string val = id(our_ip_address).state;
+          // Line 1
           it.print(0, 1, val.c_str());  // Display IP address instead of valve state
         }
-        else {
-          // Update current open valve
-          if (id(sprinklers_running).state == true)
-            // Controller running, so a valve should be open
-            it.print(0, 1, id(valves_status_string));
-          else
-            // No valves open
-            it.print(0, 1, id(to_string("${valves_idle_string}")));
+        else { 
+          // Alternate between valve state and WIFI diconnected message if WIFI is disconnected.
+          if((id(wifi_connection_state) == true) || (((id(display_passthrough_counter)  & 2) == 0))){ 
+            if(id(has_fault) == false){
+                // Turn off fault LED
+                digitalWrite(14, false);
+            }
+            else{
+                 // Turn on fault LED
+                digitalWrite(14, true);
+            }
+            
+            // Update current open valve
+            if (id(sprinklers_running).state == true)
+              // Controller running, so a valve should be open
+              // Line 1
+              it.print(0, 1, id(valves_status_string));
+            else{
+              // No valves open
+              // Line 1
+              it.print(0, 1, id(to_string("${valves_idle_string}")));
+              }
+          }
+          else { // Display "No WIFI Conn!"
+              // If no fault, then set turn on fault led
+              // This will flash the fault led if there isn't any WIFI connection.
+              if(id(has_fault) == false){
+                digitalWrite(14, true);
+              }
+              // Line 1
+              it.print(0, 1, id(to_string("${no_wifi_string}")));  
+            }
         }
 
 #
@@ -767,7 +822,6 @@ binary_sensor:
       delayed_on_off: 10ms 
     on_press:
       then:
-        - output.turn_off: fault_led
         - lambda: |-
             id(has_fault) = false;
             id(display_ip_address) = true;
@@ -807,7 +861,6 @@ sensor:
             - logger.log:
                 format:    "Overcurrent fault!"
                 level:  ERROR
-            - output.turn_on: fault_led
             - lambda: |-
                 id(has_fault) = true;
 #
