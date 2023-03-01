@@ -1,6 +1,11 @@
 #
 # Example ESPhome YAML file for the sprinkler controller
 #
+#
+# If this is the first compile, don't forget to copy secrets-sample.yaml to
+# secrets.yaml, and make the necessary changes to that file before
+# compiling with esphome.
+#
 
 substitutions:
    # Auto off string for local display  [8 chars max]
@@ -152,17 +157,17 @@ script:
 #
 
 globals:
-  - id: valves_status_string
+  - id: valves_status_string # Contains the vale state shown on line 2 of the display
     type: std::string
     restore_value: no
     initial_value: '"${valves_idle_string}"'
 
-  - id: run_state_string
+  - id: run_state_string # Contains the run state shown on line 1 of the display
     type: std::string
     restore_value: no
     initial_value: '"IDLE"'
     
-  - id: display_ip_address
+  - id: display_ip_address # Toggles the display between IP address and valve state
     type: bool
     restore_value: no
     initial_value: "false"
@@ -187,7 +192,7 @@ globals:
     restore_value: no
     initial_value: "false"
     
-  - id: display_passthrough_counter
+  - id: display_passthrough_counter # Used to alterate messages on the display
     type: int
     restore_value: no
     initial_value: "0"
@@ -201,12 +206,12 @@ esphome:
   name: esp32-sprinkler
   platform: ESP32
   board: esp32dev
-  name_add_mac_suffix: true
+  name_add_mac_suffix: true # Adds a 6 digit MAC suffix to the name defined above. Can be used to distinguish between multiple controllers.
   project:
     name: esphome.project-template
     version: "1.0"
   includes:
-    - external_components/valve_dog/valve_dog.h
+    - external_components/valve_dog/valve_dog.h # Valve watchdog code
   on_boot:
     then:
       # Read time from RTC so we have something to start with while we get time from the network.
@@ -224,10 +229,27 @@ esphome:
 #
 
 wifi:
-  networks:
-    # Note: Rename the secrets-sample.yaml file to secrets.yaml and modify it to contain your wifi network credentials.
-   - ssid: !secret wifi_ssid
-     password: !secret wifi_password
+ 
+# Configured to use improv-serial provisioning at https://web.esphome.io
+#
+# To build without improv-serial: uncomment the network, ssid and password lines
+# then update the SSID and password in secrets.yaml. 
+# Also delete the ap:, captive_portal and improv_serial blocks if you arent using them.
+#
+#  networks:
+#   - ssid: !secret wifi_ssid
+#     password: !secret wifi_password
+  ap:
+    ssid: "Sprinkler Fallback Hotspot"
+    password: !secret wifi_password
+
+captive_portal:
+
+#
+# Improv  configuration over serial port
+#
+
+improv_serial:
 
 
 #
@@ -256,7 +278,8 @@ api:
 #
 #  Uncomment the lines below to enable encrypted communication
 #  between homeassistant and the sprinkler controller.
-#  You'll need to add your encryption key in secrets.yaml.
+#  You'll need to change your encryption key in secrets.yaml,
+#  and give homeassistant the encryption key.
 #
 #  encryption:
 #          key: !secret api_key
@@ -298,18 +321,17 @@ custom_component:
   # Valve watchdog
   #
 - lambda: |-
-    auto valve_dog = new ValveDog(id(sprinkler_controller));
+    auto valve_dog = new ValveDog(id(sprinkler_controller)); // Instantiate valve watchdog class
     return {valve_dog};
 #
 #  external components
 #
 
-
 external_components:
   - source:
       type: local
       path: custom_components
-    components: [ "sprinkler", "lcd_base" ]
+    components: [ "sprinkler", "lcd_base" ] # These components are customized versions of the components in esphome to work with the display and the valve watchdog.
     
     
 interval:
@@ -317,7 +339,7 @@ interval:
     then:
       if:
         condition:
-          wifi.connected:
+          wifi.connected: # Monitor WIFI connection state
         then:
           - lambda: |-
               id(wifi_connection_state) = true;
@@ -330,7 +352,7 @@ interval:
 #
 
 sprinkler:
-  - id: sprinkler_controller
+  - id: sprinkler_controller # ID must match that used to instantiate the valve dog custom component
     main_switch: "Sprinklers"
     auto_advance_switch: "Sprinklers Auto Advance"
     valve_overlap: 3s
@@ -342,41 +364,49 @@ sprinkler:
         enable_switch: "${pump_valve_enable_name}"
         run_duration: 10s
         valve_switch_id: valve0
+
       - valve_switch: "${valve_1_switch_name}"
         enable_switch: "${valve_1_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve1
+
       - valve_switch: "${valve_2_switch_name}"
         enable_switch: "${valve_2_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve2
+
       - valve_switch: "${valve_3_switch_name}"
         enable_switch: "${valve_3_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve3
+
       - valve_switch: "${valve_4_switch_name}"
         enable_switch: "${valve_4_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve4
+
       - valve_switch: "${valve_5_switch_name}"
         enable_switch: "${valve_5_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve5
+
       - valve_switch: "${valve_6_switch_name}"
         enable_switch: "${valve_6_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve6
+
       - valve_switch: "${valve_7_switch_name}"
         enable_switch: "${valve_7_enable_name}"
         run_duration: 10s
         pump_switch_id: valve0
         valve_switch_id: valve7
+
       - valve_switch: "${valve_8_switch_name}"
         enable_switch: "${valve_8_enable_name}"
         run_duration: 10s
@@ -399,6 +429,7 @@ display:
       - GPIO27
     enable_pin: GPIO18
     rs_pin: GPIO17
+    # Lambda to refresh the display with the controller status
     # this lambda is required. If it is missing esphome will go into a boot loop.
     lambda: |-
         id(display_passthrough_counter)++;
@@ -462,7 +493,7 @@ display:
         }
 
 #
-# i2c
+# I2C bus definition
 #
 
 
@@ -472,7 +503,7 @@ i2c:
   id: bus_a
 
 #
-# pca9554
+# pca9554 GPIO Expander
 #
 
 
@@ -481,10 +512,11 @@ pca9554:
     address: 0x38 # For the PCA9554A part
 
 #
-# switch
+# Front end switches
 #
 
 switch:
+  # Reboot
   - platform: restart
     name: "Reboot Sprinkler Controller"
   
@@ -505,7 +537,8 @@ switch:
        - logger.log:
            format: "Automatic watering disabled"
            level: "INFO"
-           
+
+  # Rain disable         
   - platform: template
     name: "Sprinkler Rain Disable Switch"
     lambda: |-
@@ -525,7 +558,7 @@ switch:
            level: "INFO"
          
 
-# Valve 0 - Pump or master valve
+  # Valve 0 - Pump or master valve
   - platform: gpio
     id: valve0
     pin:
@@ -543,7 +576,7 @@ switch:
         level: "INFO"
 
 
-# Valve 1
+  # Valve 1
   - platform: gpio
     id: valve1
     pin:
@@ -564,7 +597,7 @@ switch:
         format: "Valve 1 turned off"
         level: "INFO"
 
- # Valve 2
+  # Valve 2
   - platform: gpio
     id: valve2
     pin:
@@ -586,7 +619,7 @@ switch:
         level: "INFO"
 
 
- # Valve 3
+  # Valve 3
   - platform: gpio
     id: valve3
     pin:
@@ -609,7 +642,7 @@ switch:
 
 
 
- # Valve 4
+   # Valve 4
   - platform: gpio
     id: valve4
     pin:
@@ -630,7 +663,7 @@ switch:
         format: "Valve 4 turned off"
         level: "INFO"
 
- # Valve 5
+  # Valve 5
   - platform: gpio
     id: valve5
     pin:
@@ -652,7 +685,7 @@ switch:
         level: "INFO"
 
 
- # Valve 6
+  # Valve 6
   - platform: gpio
     id: valve6
     pin:
@@ -673,7 +706,7 @@ switch:
         format: "Valve 6 turned off"
         level: "INFO"
 
- # Valve 7
+  # Valve 7
   - platform: gpio
     id: valve7
     pin:
@@ -695,7 +728,7 @@ switch:
         level: "INFO"
 
 
- # Valve 8
+  # Valve 8
 
   - platform: gpio
     id: valve8
@@ -719,7 +752,7 @@ switch:
 
 
 #
-# output
+# GPIO outputs
 #
 
 output:
@@ -763,7 +796,7 @@ binary_sensor:
       return id(sprinkler_controller).active_valve().has_value();
 
 
- # Front panel button 1 - LCD backlight/Start Watering program
+  # Front panel button 1 - LCD backlight/Start Watering program
   - platform: gpio
     id: button1
     pin:
@@ -774,13 +807,13 @@ binary_sensor:
     filters:
       delayed_on_off: 10ms
     on_click:
-      - min_length: 50ms
+      - min_length: 50ms # Short press - Turn on display backlight
         max_length: 350ms
         then:
           - output.turn_on: lcd_backlight
-          - delay: 30s
+          - delay: 300s # Leave backlight on for 5 minutes
           - output.turn_off: lcd_backlight
-      - min_length: 500ms
+      - min_length: 500ms # Long press - Start watering program 1
         max_length: 2000ms
         then:
           - logger.log:
@@ -789,7 +822,7 @@ binary_sensor:
           - script.execute: watering_program_1
      
 
-# Front panel button 2 - Stop all watering programs
+  # Front panel button 2 - Stop all watering programs
   - platform: gpio
     id: button2
     pin:
@@ -800,7 +833,7 @@ binary_sensor:
     filters:
       delayed_on_off: 10ms
     on_click:
-      - min_length: 500ms
+      - min_length: 500ms # Long press - Stop all watering
         max_length: 2000ms
         then:
           - logger.log:
@@ -810,7 +843,7 @@ binary_sensor:
        
         
 
-# Front panel button 3   - Clear fault/ show ip address
+  # Front panel button 3   - Clear fault/ show ip address
   - platform: gpio
     id: button3
     pin:
