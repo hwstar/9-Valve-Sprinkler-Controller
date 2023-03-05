@@ -17,8 +17,8 @@ substitutions:
    # Idle state strings for local display [16 chars max]
    valves_idle_string: "All Valves OFF"
    
-   # No WIFI Connection strinf [16 chars max]
-   no_wifi_string: "No WIFI Conn!"
+   # No WiFi Connection strinf [16 chars max]
+   no_wifi_string: "No WiFi Conn!"
 
    # Valve name strings for local display [16 chars max]
    valve_1_on_string: "Valve 1 ON"
@@ -187,7 +187,7 @@ globals:
     restore_value: no
     initial_value: "false"
     
-  - id: wifi_connection_state  # WIFI connection state flag
+  - id: wifi_connection_state  # WiFi connection state flag
     type: bool
     restore_value: no
     initial_value: "false"
@@ -225,7 +225,7 @@ esphome:
       - output.turn_off: lcd_backlight
 
 #
-# wifi
+# WiFi
 #
 
 wifi:
@@ -339,7 +339,7 @@ interval:
     then:
       if:
         condition:
-          wifi.connected: # Monitor WIFI connection state
+          wifi.connected: # Monitor WiFi connection state
         then:
           - lambda: |-
               id(wifi_connection_state) = true;
@@ -459,8 +459,13 @@ display:
           it.print(0, 1, val.c_str());  // Display IP address instead of valve state
         }
         else { 
-          // Alternate between valve state and WIFI diconnected message if WIFI is disconnected.
+          int display_phase = 0;
+          std::string val;
+          char dbm_str[17];
+          // Alternate between valve state and WiFi disconnected message if WiFi is disconnected.
           if((id(wifi_connection_state) == true) || (((id(display_passthrough_counter)  & 2) == 0))){ 
+
+            // This handles the state of the fault LED for all fault types
             if(id(has_fault) == false){
                 // Turn off fault LED
                 digitalWrite(14, false);
@@ -469,21 +474,45 @@ display:
                  // Turn on fault LED
                 digitalWrite(14, true);
             }
-            
-            // Update current open valve
-            if (id(sprinklers_running).state == true)
-              // Controller running, so a valve should be open
-              // Line 1
-              it.print(0, 1, id(valves_status_string));
-            else{
-              // No valves open
-              // Line 1
-              it.print(0, 1, id(to_string("${valves_idle_string}")));
-              }
+            // If no WiFi fault, cycle through valve state, ip address, ssid, and rssi
+            if(id(wifi_connection_state) == true)
+              display_phase = (id(display_passthrough_counter) & 6) >> 1;
+            switch(display_phase){
+              case 0: // Valve status
+              default:
+                // Update current open valve
+                if (id(sprinklers_running).state == true){
+                  // Controller running, so a valve should be open
+                  // Line 1
+                  it.print(0, 1, id(valves_status_string));
+                  }
+                else{
+                  // No valves open
+                  // Line 1
+                  it.print(0, 1, id(to_string("${valves_idle_string}")));
+                  }
+                break;
+              case 1: // IP Address
+                // Display IP address
+                val = id(our_ip_address).state;
+                it.print(0, 1, val.c_str());
+                break;
+              case 2: // SSID
+                // Display SSID
+                val = id(network_ssid).state;
+                it.print(0, 1, val.c_str());
+                break;
+              case 3: // RSSI
+                // Display RSSI
+                val = id(wifi_signal_dbm).state;
+                snprintf(dbm_str, 16, "RSSI: %d dBm",(int8_t) val.c_str()[0]);
+                it.print(0, 1, dbm_str);
+                break;
+            }
           }
-          else { // Display "No WIFI Conn!"
+          else { // Display "No WiFi Conn!"
               // If no fault, then set turn on fault led
-              // This will flash the fault led if there isn't any WIFI connection.
+              // This will flash the fault led if there isn't any WiFi connection.
               if(id(has_fault) == false){
                 digitalWrite(14, true);
               }
@@ -888,7 +917,7 @@ sensor:
           else
             return a;
     on_value_range:
-        - above: 1.0 # 1 Amp. A reasonable value when 3 valves are on at the same time
+        - above: 1.0 # 1 Amp. A reasonable value with 3 valves on max.
           then:
             - sprinkler.shutdown: sprinkler_controller
             - logger.log:
@@ -896,6 +925,16 @@ sensor:
                 level:  ERROR
             - lambda: |-
                 id(has_fault) = true;
+# WiFi rssi
+  - platform: wifi_signal
+    name: "WiFi RSSI dBm"
+    id: wifi_signal_dbm
+    update_interval: 16s
+    entity_category: "diagnostic"
+
+
+
+
 #
 # Text Sensor
 #
@@ -905,6 +944,8 @@ text_sensor:
   - platform: wifi_info
     ip_address: 
       id: our_ip_address
+    ssid:
+      id: network_ssid
     
 
 

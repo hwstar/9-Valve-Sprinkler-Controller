@@ -45,9 +45,13 @@ void LCDDisplay::setup() {
   // TODO dotsize
 
   // Commands can only be sent 40ms after boot-up, so let's wait if we're close
+  // Modified to 100ms to fix low level display init problems
+  
   const uint8_t now = millis();
-  if (now < 40)
-    delay(40u - now);
+  if (now < 100)
+    delay(100u - now);
+  
+  
 
   if (this->is_four_bit_mode()) {
     this->write_n_bits(0x03, 4);
@@ -55,13 +59,13 @@ void LCDDisplay::setup() {
     this->write_n_bits(0x03, 4);
     delay(5);
     this->write_n_bits(0x03, 4);
-    delayMicroseconds(175);
+    delayMicroseconds(175); // Modified to fix low level display init problems
     this->write_n_bits(0x02, 4);
   } else {
     this->command_(LCD_DISPLAY_COMMAND_FUNCTION_SET | display_function);
     delay(5);  // 4.1ms
     this->command_(LCD_DISPLAY_COMMAND_FUNCTION_SET | display_function);
-    delayMicroseconds(175);
+    delayMicroseconds(175); // Modified to fix low level display init problems
     this->command_(LCD_DISPLAY_COMMAND_FUNCTION_SET | display_function);
   }
 
