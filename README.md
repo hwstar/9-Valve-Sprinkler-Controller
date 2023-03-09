@@ -46,7 +46,7 @@ familiar with it before purchasing a board. A link to the the programming docume
 The firmware will need to be provisioned on your controller before you can use it. This is because the WIFI passwords and SSID's will need to be modified so the firmware knows how to log in to your
 WIFI network.
 
-Note: It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the procedure below. To skip provisioning see the Customizatation section. 
+Note: It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the procedure below. To skip provisioning see the Customization section. 
 
 The firmware shipped with the device supports WiFi provisioning over the serial port (Webserial) using the Google Chrome or Microsoft Edge Broswers.
 
