@@ -183,7 +183,7 @@ If this output stops toggling, the valves will be disconnected from the 24VAC po
 
 In the .yaml code example and in valve_dog.h the state of the irrigation controller is monitored. If it isn't active, then no toggling will appear on the output of GPIO16, and the relay contacts will be open within 2-6 seconds. Once the irrigation controller becomes active, toggling will appear on GPIO16 and a short time later, the relay will close. This will usually happen within 2 seconds, so that should be factored into the sprinkler controller start delay time.
 
-Note: The watchog relay should never be used to interrupt power to the valves in normal circumstances. Use the the individual valve triacs instead. 
+Note: The watchog relay should never be used to interrupt power to the valves in normal circumstances. Use the individual valve triacs instead. 
 
 ### Fault LED
 
