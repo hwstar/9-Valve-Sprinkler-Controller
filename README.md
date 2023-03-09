@@ -41,15 +41,62 @@ familiar with it before purchasing a board. A link to the the programming docume
 
 ## Firmware
 
-The firmware will need to be installed on your controller before you can use it. This is because the WIFI passwords and SSID's will need to be modified so the firmware knows how to log in to your
-WIFI network. 
+### Provisioning
+
+The firmware will need to be provisioned on your controller before you can use it. This is because the WIFI passwords and SSID's will need to be modified so the firmware knows how to log in to your
+WIFI network.
+
+Note:
+
+It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the proecedure above. See Customizatation below for details.
+
+
+The firmware shipped with the device supports WiFi provisioning over the serial port (Webserial) using the Google Chrome or Microsoft Edge Broswers.
+
+You'll need a 3.3V USB serial cable to do the provisioning.
+
+Below is the pinout of the serial connector J301.
+
+
+|PIN| Signal|
+|---|------------------------- |
+| 1 | Ground |
+| 2 | No connection |
+| 3 | No Connection |
+| 4 | RXD referenced to ESP32 |
+| 5 | TXD referenced to ESP32 |
+| 6 | No Connection |
+
+The location of the serial connector is shown below in Connectors, Pinouts and GPIO's.'
+
+Connect your 3.3V serial adapter to pins 1,4, and 5.Connecting RXD of the adapter to pin 5, TXD of the adapter to pin 4, and ground to pin 1.
+
+Next, open Chrome or Edge and navigate to the following:
+
+
+(link)[https://esphome.github.io/esp-web-tools/]
+
+Press the "CONNECT" button under "Try a live demo",
+then select the serial port of the 3.3V serial adapter cable.
+
+You should then see a menu. Choose the "CHANGE WIFI" Menu option.
+
+Enter or choose the network SSID and enter your password.
+
+Click "CONNECT"
+
+You should see a provisioned message after clicking CONNECT.
+
+You are now ready to upload a custom version of ESPHome to the device.
+
+
+### Customization
 
 Clone this repository to get the source code for the sprinkler controller.
 
-The firmware consists of ESPHome platform compiled with a user-customizable YAML file and some custom components which support features not currently contained in the ESPHome release. These custom components
-are discussed below.
+The firmware consists of ESPHome platform compiled with a user-customizable YAML file and some custom components which are modifications of modules contained in Esphome. 
 
-You will need to compile and upload the software after you rename secrets-sample.yaml to secrets.yaml, and change the SSID and passwords in secrets.yaml to match your WIFI network and passwords respectively.
+Before compiling, rename secrets-sample.yaml to secrets.yaml, and change items in secrets.yaml to suit your requirements.
 
 Once compiled the firmware is installed via a 3.3V serial cable. J201 on the board is a male header which is compatible with FTDI serial cables such as FTDI part number TTL-232R-3V3. 
 
