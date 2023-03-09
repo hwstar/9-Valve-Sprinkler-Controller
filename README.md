@@ -38,6 +38,12 @@ One should have some experience modifying esphome yaml files, reading wiring dia
 and using the esphome tool to program esphome devices. If you are not sure how to program firmware into an esphome device, please study the documentation on esphome.com and become
 familiar with it before purchasing a board. A link to the the programming documentation can be found [here](https://esphome.io/guides/cli.html)
 
+## WIKI
+
+Besides this README.md, there is more documentation in the WIKI
+
+(wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki]
+
 
 ## Firmware
 
