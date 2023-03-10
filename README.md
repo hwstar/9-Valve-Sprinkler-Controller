@@ -21,7 +21,7 @@ controller based on an ESP32. It has the following features:
 * Monitoring of the total valve current.
 * Watchdog relay disconnects all valves if not serviced periodically by the firmware.
 * Expansion connector for future valve expanders.
-* Plastic Enclosure and graphic overlay.
+* ABS Plastic Enclosure and graphic overlay.
 
 
 
@@ -140,6 +140,8 @@ Not supplied in the kit:
 2. 3.3V serial adapter for flashing firmware onto the board and connecting cable.
 3. 24V 40VA transformer
 4. Wire
+5. Wood screws for attaching the controller to a backboard
+6. External connectors (i.e. WAGOs or wire nuts) to common the valve return leads.
 
 
 ### Connectors Pinouts and GPIO's
