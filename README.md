@@ -13,7 +13,7 @@ controller based on an ESP32. It has the following features:
 * ESP32 Microcontroller
 * Uses a 40VA 24VAC wall transformer with an internal fuse.
 * Operates the 24 Volt AC sprinkler valves commonly used for irrigation.
-* 9 Indpendently controllable valve outputs.
+* 9 Independently controllable valve outputs.
 * 1602 LCD display.
 * 3 Front panel buttons.
 * Real time clock.
@@ -23,9 +23,8 @@ controller based on an ESP32. It has the following features:
 * Expansion connector for future valve expanders.
 * ABS Plastic Enclosure and graphic overlay.
 
-
-
-The hardware is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
+This hardware is for sale on (Tindie)[https://www.tindie.com/products/home-control-labs/9-valve-sprinkler-controller-works-with-esphome/]
+It is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
 
 ## Disclaimer
 
