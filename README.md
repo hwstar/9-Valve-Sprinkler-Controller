@@ -23,7 +23,7 @@ controller based on an ESP32. It has the following features:
 * Expansion connector for future valve expanders.
 * ABS Plastic Enclosure and graphic overlay.
 
-This hardware is for sale on (Tindie)[https://www.tindie.com/products/home-control-labs/9-valve-sprinkler-controller-works-with-esphome/]
+This hardware is for sale on [Tindie](https://www.tindie.com/products/home-control-labs/9-valve-sprinkler-controller-works-with-esphome/)
 It is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
 
 ## Disclaimer
@@ -41,7 +41,7 @@ familiar with it before purchasing a board. A link to the the programming docume
 
 Besides this README.md, there is more documentation in the WIKI
 
-(wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki]
+[wiki](https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki)
 
 
 ## Firmware
@@ -76,7 +76,7 @@ Connect your 3.3V serial adapter to pins 1,4, and 5.Connecting RXD of the adapte
 Next, open Chrome or Edge and navigate to the following:
 
 
-(link)[https://esphome.github.io/esp-web-tools/]
+[link](https://esphome.github.io/esp-web-tools/)
 
 Press the "CONNECT" button under "Try a live demo",
 then select the serial port of the 3.3V serial adapter cable.
@@ -102,7 +102,7 @@ Before compiling, rename secrets-sample.yaml to secrets.yaml, and change items i
 
 Once compiled the firmware is installed via a 3.3V serial cable. J201 on the board is a male header which is compatible with FTDI serial cables such as FTDI part number TTL-232R-3V3. 
 
-For firmware upload instructions please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki]
+For firmware upload instructions please refer to the [wiki](https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki)
 
 
 ### ESPHOME yaml file 
@@ -145,7 +145,7 @@ Not supplied in the kit:
 
 ### Connectors Pinouts and GPIO's
 
-Please refer to the (wiki)[https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki] for this reference information.
+Please refer to the [wiki](https://github.com/hwstar/9-Valve-Sprinkler-Controller/wiki] for this reference information.)
 
 
 ### Power, Valve, and Serial Connectors
