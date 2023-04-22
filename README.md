@@ -8,7 +8,7 @@
 
 
 This is the code and documentation repository for a 9 valve sprinkler
-controller based on an ESP32. It has the following features:
+controller kit based on an ESP32. It has the following features:
 
 * ESP32 Microcontroller
 * Uses a 40VA 24VAC wall transformer with an internal fuse.
@@ -33,8 +33,8 @@ By purchasing and/or using the hardware, you you indicate you are using it at yo
 ## Audience
 
 The controller is shipped without firmware which can connect to your WIFI network. It will require some firmware programming and electrical knowledge to successfully implement. 
-One should have some experience modifying esphome yaml files, reading wiring diagrams, using a Windows or Linux command line shell, using serial devices such as the FTDI serial cable,
-and using the esphome tool to program esphome devices. If you are not sure how to program firmware into an esphome device, please study the documentation on esphome.com and become
+One should have some experience modifying ESPHome yaml files, reading wiring diagrams, using a Windows or Linux command line shell, using serial devices such as the FTDI serial cable,
+and using the ESPHome tool to program ESPHome devices. If you are not sure how to program firmware into an ESPHome device, please study the documentation on esphome.com and become
 familiar with it before purchasing a board. A link to the the programming documentation can be found [here](https://esphome.io/guides/cli.html)
 
 ## WIKI
@@ -96,7 +96,7 @@ You are now ready to upload a custom version of ESPHome to the device.
 
 Clone this repository to get the source code for the sprinkler controller.
 
-The firmware consists of ESPHome platform compiled with a user-customizable YAML file and some custom components which are modifications of modules contained in Esphome. 
+The firmware consists of ESPHome platform compiled with a user-customizable YAML file and some custom components which are modifications of modules contained in ESPHome. 
 
 Before compiling, rename secrets-sample.yaml to secrets.yaml, and change items in secrets.yaml to suit your requirements.
 
@@ -169,7 +169,7 @@ The expansion connector J201 is an 8 pin 3mm pitch Molex micro fit connector (43
 ### Real Time Clock Jumper and Battery
 
 J302 on the board can be in one of 2 positions. In position 1-2, the battery is connected to the DS1307 clock. In position 2-3 The DS1307 battery input is grounded. The board is shipped with the jumper in positions 2-3. 
-To fully utilize the DS1307, a CR927 battery (not-supplied) must be inserted, and the the jumper must be moved to positions 1-2. If the real time clock battery back feature isn't going to be used, the jumper should remain
+To fully utilize the DS1307, a CR927 battery (not supplied) must be inserted, and the the jumper must be moved to positions 1-2. If the real time clock battery back feature isn't going to be used, the jumper should remain
 in positions 2-3. 
 
 Note: If the jumper is removed or missing, the battery input to the DS1307 will be left floating, and the DS1307 may not be able to be properly accessed via the software.
@@ -181,7 +181,7 @@ The display used is a widely available 3.3V 1602 type. It is interfaced to the E
 
 ### Buttons
 
-The 3 momentary buttons are connected directly to the ESP32. With associated definintions in the .yaml file, they provide a way to manually initiate operations in case the homeassistant server goes off line.
+The 3 momentary buttons are connected directly to the ESP32. With associated definitions in the .yaml file, they provide a way to manually initiate operations in case the homeassistant server goes off line.
 
 ### Watchdog Relay
 
@@ -190,7 +190,7 @@ If this output stops toggling, the valves will be disconnected from the 24VAC po
 
 In the .yaml code example and in valve_dog.h the state of the irrigation controller is monitored. If it isn't active, then no toggling will appear on the output of GPIO16, and the relay contacts will be open within 2-6 seconds. Once the irrigation controller becomes active, toggling will appear on GPIO16 and a short time later, the relay will close. This will usually happen within 2 seconds, so that should be factored into the sprinkler controller start delay time.
 
-Note: The watchog relay should never be used to interrupt power to the valves in normal circumstances. Use the individual valve triacs instead. 
+Note: The watchdog relay should never be used to interrupt power to the valves in normal circumstances. Use the individual valve triacs instead. 
 
 ### Fault LED
 
