@@ -28,7 +28,7 @@ It is primarily designed to work with [ESPHome](https://github.com/esphome/espho
 
 ## Disclaimer
 
-By purchasing and/or using the hardware, you you indicate you are using it at your own risk. 
+By purchasing and/or using the hardware, you indicate you are using it at your own risk. 
 
 ## Audience
 
