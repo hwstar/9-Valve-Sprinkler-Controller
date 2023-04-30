@@ -439,18 +439,16 @@ display:
         id(display_passthrough_counter)++;
         // Line 0
         // Current run state
-        char run_state_string[9];
-        run_state_string[8] = 0;
+        static const char *run_state_string;    
         // Print state, rain, or auto off string
         if(((id(automatic_watering_enable) == false) || (id(is_raining) == true )) && (id(sprinklers_running).state == false))
           if(id(is_raining) == true)
-            strcpy(run_state_string, "${rain_string}");
+            run_state_string = "${rain_string}";
           else
-            strcpy(run_state_string, "${auto_off_string}");
+            run_state_string = "${auto_off_string}";
         else{
           // Convert Enum to string
           int state = id(sprinkler_controller).controller_state();
-          const char *run_state_string;    
           switch(state){
             case 0:
               run_state_string = "${idle_state_string}";
