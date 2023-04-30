@@ -215,7 +215,7 @@ esphome:
     name: esphome.project-template
     version: "1.0"
   includes:
-    - external_components/valve_dog/valve_dog.h # Valve watchdog code
+    - custom_components/valve_dog/valve_dog.h # Valve watchdog code
   on_boot:
     then:
       # Read time from RTC so we have something to start with while we get time from the network.
@@ -334,8 +334,8 @@ custom_component:
 external_components:
   - source:
       type: local
-      path: custom_components
-    components: [ "sprinkler", "lcd_base" ] # These components are customized versions of the components in esphome to work with the display and the valve watchdog.
+      path: external_components
+    components: [ "sprinkler", "lcd_base" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
     
     
 interval:
