@@ -8,6 +8,15 @@
 #
 
 substitutions:
+
+   # State strings [8 chars max]
+   idle_state_string: "IDLE"
+   starting_state_string: "STARTING"
+   active_state_string: "ACTIVE"
+   stopping_state_string: "STOPPING"
+   bypass_state_string: "BYPASS"
+    
+
    # Auto off string for local display  [8 chars max]
    auto_off_string: "AUTO OFF"
    
@@ -161,11 +170,6 @@ globals:
     type: std::string
     restore_value: no
     initial_value: '"${valves_idle_string}"'
-
-  - id: run_state_string # Contains the run state shown on line 1 of the display
-    type: std::string
-    restore_value: no
-    initial_value: '"IDLE"'
     
   - id: display_ip_address # Toggles the display between IP address and valve state
     type: bool
@@ -443,8 +447,31 @@ display:
             strcpy(run_state_string, "${rain_string}");
           else
             strcpy(run_state_string, "${auto_off_string}");
-        else
-          strncpy(run_state_string, id(sprinkler_controller).current_ctrlr_state_as_str().c_str(), 8);
+        else{
+          // Convert Enum to string
+          int state = id(sprinkler_controller).controller_state();
+          const char *run_state_string;    
+          switch(state){
+            case 0:
+              run_state_string = "${idle_state_string}";
+              break;         
+            case 1:
+              run_state_string = "${starting_state_string}";
+              break;
+            case 2:
+              run_state_string = "${active_state_string}";
+              break;       
+            case 3:
+              run_state_string = "${stopping_state_string}";
+              break;       
+            case 4:
+              run_state_string = "${bypass_state_string}";
+              break;       
+            default:
+              run_state_string = "UNKNOWN";
+              break;    
+          }
+        }
         // Line 0
         it.print(0, 0, run_state_string );
         // Print the current time

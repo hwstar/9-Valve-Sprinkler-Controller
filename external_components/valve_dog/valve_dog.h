@@ -43,7 +43,8 @@ class ValveDog : public Component {
   void loop() override {
     // Called repeatedly at appx. 60Hz
 
-    if(this->sprc_obj->active_valve().has_value()){ // Sprinkler controller must be active
+    //if(this->sprc_obj->active_valve().has_value()){ // Sprinkler controller must be active
+    if(this->sprc_obj->any_controller_is_active()){ // If any sprinkler controller is active
           // Toggle the valve watchdog pin if enabled
           pin_state = !pin_state;
           digitalWrite(DOG_PIN, pin_state);
