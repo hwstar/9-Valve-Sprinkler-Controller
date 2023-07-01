@@ -112,7 +112,7 @@ This file can be used as the basis for your customized yaml file.
 
 ### External component
 
-1 One external component are located in the /external_components directory. This is for support of the display.
+One external component are located in the /external_components directory. This is for support of the display.
 No modification of this external component should be necessary, but it must
 be present when the firmware is compiled, or there will be compile errors.
 
