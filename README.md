@@ -110,15 +110,15 @@ For firmware upload instructions please refer to the [wiki](https://github.com/h
 An example YAML file is provided to aid in the implementation of the sprinkler controller. It contains some examples on how to do things with the hardware. Please refer to the file esp32-sprinkler.yaml
 This file can be used as the basis for your customized yaml file. 
 
-### Custom components
+### External component
 
-1 Custom component are located in the /custom_components directory. This is for support of the display.
-No modification of this custom component should be necessary, but it must
+1 One external component are located in the /external_components directory. This is for support of the display.
+No modification of this external component should be necessary, but it must
 be present when the firmware is compiled, or there will be compile errors.
 
-### External Component
+### Custom Component
 
-There is one external_component located in the /external_components directory. This external component controls the Valve watchdog relay.No modification of this external component
+There is one custom component located in the /custom_components directory. This external component controls the Valve watchdog relay.No modification of this external component
 should be necessary, but it must be present when the firmware is compiled, or there will be compile errors.
 
 
