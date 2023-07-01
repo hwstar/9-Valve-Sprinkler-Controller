@@ -185,7 +185,7 @@ The 3 momentary buttons are connected directly to the ESP32. With associated def
 
 ### Watchdog Relay
 
-The watchdog relay will disconnect all the valves if no output toggling is detected on GPIO16. There is an external component called valve_dog.h which toggles GPIO16 each time the loop function is called.
+The watchdog relay will disconnect all the valves if no output toggling is detected on GPIO16. There is an custom component called valve_dog.h which toggles GPIO16 each time the loop function is called.
 If this output stops toggling, the valves will be disconnected from the 24VAC power source. According to the ESPHome docs, the loop() method in valve_dog.h is called at approximately a 60Hz rate. There is a charge pump on the board connected to a MOSFET which drives the watchdog relay. If the input to the charge pump stops toggling, then the relay opens.
 
 In the .yaml code example and in valve_dog.h the state of the irrigation controller is monitored. If it isn't active, then no toggling will appear on the output of GPIO16, and the relay contacts will be open within 2-6 seconds. Once the irrigation controller becomes active, toggling will appear on GPIO16 and a short time later, the relay will close. This will usually happen within 2 seconds, so that should be factored into the sprinkler controller start delay time.
