@@ -24,7 +24,7 @@ controller kit based on an ESP32. It has the following features:
 * ABS Plastic Enclosure and graphic overlay.
 
 This hardware is for sale on [Tindie](https://www.tindie.com/products/home-control-labs/9-valve-sprinkler-controller-works-with-esphome/)
-It is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.2.1 or later.
+It is primarily designed to work with [ESPHome](https://github.com/esphome/esphome) firmware version 2023.6.3 or later.
 
 ## Disclaimer
 
@@ -112,8 +112,8 @@ This file can be used as the basis for your customized yaml file.
 
 ### Custom components
 
-2 Custom components are located in the /custom_components directory. They are for support of the display, and a modified version of the ESPHome sprinkler controller component.
-Some of these components may get removed when they are integrated into ESPHome or are otherwise no longer required. No modification of these custom components should be necessary, but they must
+1 Custom component are located in the /custom_components directory. This is for support of the display.
+No modification of this custom component should be necessary, but it must
 be present when the firmware is compiled, or there will be compile errors.
 
 ### External Component

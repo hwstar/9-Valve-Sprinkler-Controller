@@ -335,7 +335,7 @@ external_components:
   - source:
       type: local
       path: external_components
-    components: [ "sprinkler", "lcd_base" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
+    components: [ "lcd_base" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
     
     
 interval:
