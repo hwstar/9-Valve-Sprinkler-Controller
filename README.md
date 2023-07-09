@@ -51,7 +51,7 @@ Besides this README.md, there is more documentation in the WIKI
 The firmware will need to be provisioned on your controller before you can use it. This is because the WIFI passwords and SSID's will need to be modified so the firmware knows how to log in to your
 WIFI network.
 
-Note: It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the procedure below. To skip provisioning see the Customization section. 
+Note: It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the procedure below. 
 
 The firmware shipped with the device supports WiFi provisioning over the serial port (Webserial) using the Google Chrome or Microsoft Edge Broswers.
 
@@ -98,7 +98,7 @@ Clone this repository to get the source code for the sprinkler controller.
 
 The firmware consists of ESPHome platform compiled with a user-customizable YAML file and some custom components which are modifications of modules contained in ESPHome. 
 
-Before compiling, rename secrets-sample.yaml to secrets.yaml, and change items in secrets.yaml to suit your requirements.
+> **_NOTE:_** If you wish to configure without using improv to set the WIFI credentials, use the esp32-sprinkler-without-improv.yaml instead of esp32-sprinkler.yaml. Before compiling, rename secrets-sample.yaml to secrets.yaml, and change items in secrets.yaml to suit your requirements.
 
 Once compiled the firmware is installed via a 3.3V serial cable. J201 on the board is a male header which is compatible with FTDI serial cables such as FTDI part number TTL-232R-3V3. 
 
