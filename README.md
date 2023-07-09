@@ -51,9 +51,9 @@ Besides this README.md, there is more documentation in the WIKI
 The firmware will need to be provisioned on your controller before you can use it. This is because the WIFI passwords and SSID's will need to be modified so the firmware knows how to log in to your
 WIFI network.
 
-Note: It is also possible to just upload new firmware, skipping these provisioning steps should there be any trouble with the procedure below. 
+Note: It is also possible to just upload new firmware, skipping these provisioning steps if you don't want to use improv. 
 
-The firmware shipped with the device supports WiFi provisioning over the serial port (Webserial) using the Google Chrome or Microsoft Edge Broswers.
+The firmware shipped with the device supports WiFi provisioning (improv) over the serial port (Webserial) using the Google Chrome or Microsoft Edge Broswers.
 
 You'll need a 3.3V USB serial cable to do the provisioning.
 
