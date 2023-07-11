@@ -35,17 +35,21 @@ void ValveDog::setup(){
 void ValveDog::loop() {
   // Called repeatedly at appx. 60Hz
 
-  //if(this->sprc_obj->active_valve().has_value()){ // Sprinkler controller must be active
   if(this->sprc_obj->any_controller_is_active()){ // If any sprinkler controller is active
         // Toggle the valve watchdog pin if enabled
-        pin_state = !pin_state;
-        digitalWrite(DOG_PIN, pin_state);
+        this->pin_state = !this->pin_state;
+        digitalWrite(DOG_PIN, this-> pin_state);
   }
   else {
    // Force  the valve watchdog pin low
    this->pin_state = false;
-   digitalWrite(DOG_PIN, pin_state);
+   digitalWrite(DOG_PIN, this->pin_state);
   }
 }
+
+void ValveDog::dump_config(){
+    ESP_LOGCONFIG(TAG, "ValveDog");
+}
+
 
 

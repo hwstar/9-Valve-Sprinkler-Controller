@@ -15,7 +15,9 @@
 
 #include "esphome.h"
 #include "esphome/core/log.h"
+#include "esphome/components/sprinkler.h"
 #include "valve_dog.h"
+
 namespace esphome {
 namespace valve_dog {
 
@@ -23,7 +25,7 @@ namespace valve_dog {
 
 class ValveDog : public Component {
   
- protected:
+protected:
    sprinkler::Sprinkler *sprc_obj;
   
  public:
@@ -34,13 +36,14 @@ class ValveDog : public Component {
   }
     
     
-  void setup() override {
-  }
+  void setup() override;
 
-  void loop() override {
-  }
-  protected:
-    bool pin_state;
+  void loop() override;
+  
+  void dump_config() override;
+  
+protected:
+  bool pin_state;
 };
 }  // namespace lcd_base
 }  // namespace esphome
