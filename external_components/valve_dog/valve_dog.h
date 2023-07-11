@@ -14,6 +14,10 @@
 
 
 #include "esphome.h"
+#include "esphome/core/log.h"
+#include "valve_dog.h"
+namespace esphome {
+namespace valve_dog {
 
 #define DOG_PIN 16
 
@@ -31,30 +35,12 @@ class ValveDog : public Component {
     
     
   void setup() override {
-    // Called once
-    this->pin_state = false;
-    pinMode(DOG_PIN, OUTPUT);
-    digitalWrite(DOG_PIN, pin_state);
   }
 
-  //  Enable or disable the valve watchdog
-
-
   void loop() override {
-    // Called repeatedly at appx. 60Hz
-
-    //if(this->sprc_obj->active_valve().has_value()){ // Sprinkler controller must be active
-    if(this->sprc_obj->any_controller_is_active()){ // If any sprinkler controller is active
-          // Toggle the valve watchdog pin if enabled
-          pin_state = !pin_state;
-          digitalWrite(DOG_PIN, pin_state);
-    }
-    else {
-     // Force  the valve watchdog pin low
-     this->pin_state = false;
-     digitalWrite(DOG_PIN, pin_state);
-    }
   }
   protected:
     bool pin_state;
 };
+}  // namespace lcd_base
+}  // namespace esphome
