@@ -12,10 +12,14 @@
 // function with the sprinkler controller name passed as an argument.
 // Refer to the note below.
 
+#include "esphome.h"
+
+
+
+
 namespace esphome {
 namespace valve_dog {
 
-#include "esphome.h"
 
 #define DOG_PIN 16
 
@@ -50,6 +54,9 @@ void ValveDog::loop() {
 void ValveDog::dump_config(){
     ESP_LOGCONFIG(TAG, "ValveDog");
 }
+}
+}
+
 
 
 

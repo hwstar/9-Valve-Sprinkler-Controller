@@ -15,8 +15,7 @@
 
 #include "esphome.h"
 #include "esphome/core/log.h"
-#include "esphome/components/sprinkler.h"
-#include "valve_dog.h"
+
 
 namespace esphome {
 namespace valve_dog {
