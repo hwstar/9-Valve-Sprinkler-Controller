@@ -20,7 +20,6 @@
 namespace esphome {
 namespace valve_dog {
 
-#define DOG_PIN 16
 
 class ValveDog : public Component {
   
@@ -30,14 +29,14 @@ protected:
  public:
     
   // Constructor
-  ValveDog(sprinkler::Sprinkler *sc_obj){
-    this->sprc_obj = sc_obj;
-  }
+  ValveDog(){}
     
     
   void setup() override;
 
   void loop() override;
+  
+  void set_sprinkler_object(sprinkler::Sprinkler *controller); 
   
   void dump_config() override;
   

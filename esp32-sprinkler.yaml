@@ -323,7 +323,7 @@ external_components:
   - source:
       type: local
       path: external_components
-    components: [ "lcd_base", "valve_dog" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
+    components: [ "lcd_base", "valve_dog" ] # These external components are customized version of the component in esphome to work with the display, and the valve watchdog .
     
     
     
@@ -536,6 +536,7 @@ display:
         }
 
 valve_dog:
+  set_sprinkler_controller: id(sprinkler_controller)
 
 
 #

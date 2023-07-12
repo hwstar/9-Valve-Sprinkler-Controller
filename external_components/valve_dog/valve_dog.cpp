@@ -14,14 +14,11 @@
 
 #include "esphome.h"
 
-
-
-
 namespace esphome {
 namespace valve_dog {
 
 
-#define DOG_PIN 16
+static const int DOG_PIN = 16;
 
 static const char *TAG = "valve_dog.component";
 
@@ -31,15 +28,24 @@ void ValveDog::setup(){
   this->pin_state = false;
   pinMode(DOG_PIN, OUTPUT);
   digitalWrite(DOG_PIN, pin_state);
+  this->sprc_obj = NULL;
+}
+
+// Setter for sprinkler controller object
+
+void ValveDog::set_sprinkler_object(sprinkler::Sprinkler *controller) {
+  this->sprc_obj = controller;
 }
 
 //  Enable or disable the valve watchdog
 
 
+
 void ValveDog::loop() {
   // Called repeatedly
   
-  if(this->sprc_obj->any_controller_is_active()){ // If any sprinkler controller is active
+  
+  if((this->sprc_obj != NULL) && (this->sprc_obj->any_controller_is_active())){ // If any sprinkler controller is active
         // Toggle the valve watchdog pin if enabled
         this->pin_state = !this->pin_state;
         digitalWrite(DOG_PIN, this-> pin_state);
@@ -52,10 +58,14 @@ void ValveDog::loop() {
 }
 
 void ValveDog::dump_config(){
-    ESP_LOGCONFIG(TAG, "ValveDog");
-}
-}
-}
+    if(this->sprc_obj)
+      ESP_LOGCONFIG(TAG, "Sprinkler object set");
+    else
+      ESP_LOGCONFIG(TAG, "Sprinkler object not set");
+  }
+} // Valve Dog
+} // Esphome
+
 
 
 
