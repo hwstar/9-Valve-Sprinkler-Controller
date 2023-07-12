@@ -37,8 +37,8 @@ void ValveDog::setup(){
 
 
 void ValveDog::loop() {
-  // Called repeatedly at appx. 60Hz
-
+  // Called repeatedly
+  
   if(this->sprc_obj->any_controller_is_active()){ // If any sprinkler controller is active
         // Toggle the valve watchdog pin if enabled
         this->pin_state = !this->pin_state;
