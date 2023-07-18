@@ -535,6 +535,13 @@ display:
             }
         }
 
+#
+# Valve watchdog external component
+#
+# This monitors all of the sprinkler controllers and 
+# closes or opens the watchdog relay accordingly.
+#
+
 valve_dog:
   sprinkler_id: sprinkler_controller
 
