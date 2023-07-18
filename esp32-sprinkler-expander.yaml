@@ -1,5 +1,5 @@
 #
-# Example ESPhome YAML file for the sprinkler controller
+# Example ESPhome YAML file for the sprinkler controller with an expansion module
 #
 #
 # If this is the first compile, don't forget to copy secrets-sample.yaml to
@@ -38,6 +38,14 @@ substitutions:
    valve_6_on_string: "Valve 6 ON"
    valve_7_on_string: "Valve 7 ON"
    valve_8_on_string: "Valve 8 ON"
+   valve_9_on_string: "Valve 9 ON"
+   valve_10_on_string: "Valve 10 ON"
+   valve_11_on_string: "Valve 11 ON"
+   valve_12_on_string: "Valve 12 ON"
+   valve_13_on_string: "Valve 13 ON"
+   valve_14_on_string: "Valve 14 ON"
+   valve_15_on_string: "Valve 15 ON"
+   valve_16_on_string: "Valve 16 ON"
    
    # Pump valve name
    pump_valve_name: "Master Valve"
@@ -51,6 +59,14 @@ substitutions:
    valve_6_switch_name: "Valve 6"
    valve_7_switch_name: "Valve 7"
    valve_8_switch_name: "Valve 8"
+   valve_9_switch_name: "Valve 9"
+   valve_10_switch_name: "Valve 10"
+   valve_11_switch_name: "Valve 11"
+   valve_12_switch_name: "Valve 12"
+   valve_13_switch_name: "Valve 13"
+   valve_14_switch_name: "Valve 14"
+   valve_15_switch_name: "Valve 15"
+   valve_16_switch_name: "Valve 16"
    
    # Pump valve enable name
    pump_valve_enable_name: "Main/Pump Valve Enable"
@@ -64,6 +80,14 @@ substitutions:
    valve_6_enable_name: "Valve Enable 6"
    valve_7_enable_name: "Valve Enable 7"
    valve_8_enable_name: "Valve Enable 8"
+   valve_9_enable_name: "Valve Enable 9"
+   valve_10_enable_name: "Valve Enable 10"
+   valve_11_enable_name: "Valve Enable 11"
+   valve_12_enable_name: "Valve Enable 12"
+   valve_13_enable_name: "Valve Enable 13"
+   valve_14_enable_name: "Valve Enable 14"
+   valve_15_enable_name: "Valve Enable 15"
+   valve_16_enable_name: "Valve Enable 16"
 
 
 #
@@ -406,6 +430,55 @@ sprinkler:
         pump_switch_id: valve0
         valve_switch_id: valve8
 
+      - valve_switch: "${valve_9_switch_name}"
+        enable_switch: "${valve_9_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve9
+
+      - valve_switch: "${valve_10_switch_name}"
+        enable_switch: "${valve_10_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve10
+
+      - valve_switch: "${valve_11_switch_name}"
+        enable_switch: "${valve_11_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve11
+
+      - valve_switch: "${valve_12_switch_name}"
+        enable_switch: "${valve_12_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve12
+
+      - valve_switch: "${valve_13_switch_name}"
+        enable_switch: "${valve_13_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve13
+
+      - valve_switch: "${valve_14_switch_name}"
+        enable_switch: "${valve_14_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve14
+
+      - valve_switch: "${valve_15_switch_name}"
+        enable_switch: "${valve_15_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve15
+
+      - valve_switch: "${valve_16_switch_name}"
+        enable_switch: "${valve_16_enable_name}"
+        run_duration: 10s
+        pump_switch_id: valve0
+        valve_switch_id: valve16
+
+
 
 #
 # 1602 LCD display
@@ -556,8 +629,10 @@ i2c:
 
 
 pca9554:
-    id: pca9554_valves_1_8
-    address: 0x38 # For the PCA9554A part
+    - id: pca9554_valves_1_8
+      address: 0x38 # For the PCA9554A part on the controller
+    - id: pca9554_valves_9_16
+      address: 0x39 # For the PCA9554A part on the expander
 
 #
 # Front end switches
@@ -796,6 +871,182 @@ switch:
     on_turn_off:
     - logger.log:
         format: "Valve 8 turned off"
+        level: "INFO"
+
+
+
+  # Valve 9
+  - platform: gpio
+    id: valve9
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 0
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 9 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_9_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 9 turned off"
+        level: "INFO"
+
+  # Valve 10
+  - platform: gpio
+    id: valve10
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 1
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 10 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_10_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 10 turned off"
+        level: "INFO"
+
+
+  # Valve 11
+  - platform: gpio
+    id: valve11
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 2
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 11 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_11_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 11 turned off"
+        level: "INFO"
+
+
+
+   # Valve 12
+  - platform: gpio
+    id: valve12
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 3
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 12 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_12_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 12 turned off"
+        level: "INFO"
+
+  # Valve 13
+  - platform: gpio
+    id: valve13
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 4
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 13 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_13_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 13 turned off"
+        level: "INFO"
+
+
+  # Valve 14
+  - platform: gpio
+    id: valve14
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 5
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 14 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_14_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 14 turned off"
+        level: "INFO"
+
+  # Valve 15
+  - platform: gpio
+    id: valve15
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 6
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 15 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_15_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 15 turned off"
+        level: "INFO"
+
+
+  # Valve 16
+
+  - platform: gpio
+    id: valve16
+    pin:
+      pca9554: pca9554_valves_9_16
+      number: 7
+      mode:
+        output: true
+      inverted: false
+    on_turn_on:
+    - logger.log:
+        format: "Valve 16 turned on"
+        level: "INFO"
+    - lambda: |-
+        id(valves_status_string) = to_string("${valve_16_on_string}");
+
+    on_turn_off:
+    - logger.log:
+        format: "Valve 16 turned off"
         level: "INFO"
 
 

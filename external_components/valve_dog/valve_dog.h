@@ -29,14 +29,13 @@ protected:
  public:
     
   // Constructor
-  ValveDog(){}
-    
+  ValveDog();
     
   void setup() override;
 
   void loop() override;
   
-  void set_sprinkler_object(sprinkler::Sprinkler *controller); 
+  void set_sprinkler(sprinkler::Sprinkler *sprinkler_id); 
   
   void dump_config() override;
   

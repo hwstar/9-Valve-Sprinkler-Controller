@@ -22,19 +22,23 @@ static const int DOG_PIN = 16;
 
 static const char *TAG = "valve_dog.component";
 
+ValveDog::ValveDog(){
+  this->sprc_obj = NULL; // Make sure this is set to NULL initially or bad things will happen!
+}
 
 void ValveDog::setup(){
   // Called once
+  ESP_LOGD(TAG, "Valve_dog setup() called");
   this->pin_state = false;
   pinMode(DOG_PIN, OUTPUT);
   digitalWrite(DOG_PIN, pin_state);
-  this->sprc_obj = NULL;
 }
 
 // Setter for sprinkler controller object
 
-void ValveDog::set_sprinkler_object(sprinkler::Sprinkler *controller) {
-  this->sprc_obj = controller;
+void ValveDog::set_sprinkler(sprinkler::Sprinkler *sprinkler_id) {
+   ESP_LOGD(TAG, "set_sprinkler() called");
+  this->sprc_obj = sprinkler_id;
 }
 
 //  Enable or disable the valve watchdog
@@ -44,8 +48,8 @@ void ValveDog::set_sprinkler_object(sprinkler::Sprinkler *controller) {
 void ValveDog::loop() {
   // Called repeatedly
   
-  
-  if((this->sprc_obj != NULL) && (this->sprc_obj->any_controller_is_active())){ // If any sprinkler controller is active
+  if((this->sprc_obj != NULL) && 
+  (this->sprc_obj->any_controller_is_active())){ // If any sprinkler controller is active
         // Toggle the valve watchdog pin if enabled
         this->pin_state = !this->pin_state;
         digitalWrite(DOG_PIN, this-> pin_state);
