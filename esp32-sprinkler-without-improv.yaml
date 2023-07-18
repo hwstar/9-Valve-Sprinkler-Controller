@@ -214,8 +214,6 @@ esphome:
   project:
     name: esphome.project-template
     version: "1.0"
-  includes:
-    - custom_components/valve_dog/valve_dog.h # Valve watchdog code
   on_boot:
     then:
       # Read time from RTC so we have something to start with while we get time from the network.
@@ -303,16 +301,6 @@ dashboard_import:
   package_import_url: github://hwstar/9-Valve-Sprinkler-Controller/esp32-sprinkler.yaml@main
 
 #
-# custom components
-#
-custom_component:
-  #
-  # Valve watchdog
-  #
-- lambda: |-
-    auto valve_dog = new ValveDog(id(sprinkler_controller)); // Instantiate valve watchdog class
-    return {valve_dog};
-#
 #  external components
 #
 
@@ -320,7 +308,8 @@ external_components:
   - source:
       type: local
       path: external_components
-    components: [ "lcd_base" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
+    components: [ "lcd_base", "valve_dog" ] # These external components are customized version of the component in esphome to work with the display, and the valve watchdog .
+    
     
     
 interval:
@@ -531,6 +520,10 @@ display:
             }
         }
 
+valve_dog:
+  sprinkler_id: sprinkler_controller
+
+
 #
 # I2C bus definition
 #
@@ -540,6 +533,7 @@ i2c:
   sda: 21
   scl: 22
   id: bus_a
+
 
 #
 # pca9554 GPIO Expander
