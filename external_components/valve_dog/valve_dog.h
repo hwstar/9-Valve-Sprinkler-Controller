@@ -12,6 +12,7 @@
 // function with the sprinkler controller name passed as an argument.
 // Refer to the note below.
 
+#pragma once
 
 #include "esphome.h"
 #include "esphome/core/log.h"
