@@ -249,6 +249,7 @@ esphome:
       - delay: 10s
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
+  min_version: "2023.6.3"
 
 #
 # WiFi
