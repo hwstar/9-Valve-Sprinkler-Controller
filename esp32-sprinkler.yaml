@@ -225,7 +225,7 @@ esphome:
       - delay: 10s
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
-  min_version: "2023.6.3"
+  min_version: "2024.2.1"
 
 #
 # WiFi
@@ -233,27 +233,12 @@ esphome:
 
 wifi:
  
-# Configured to use improv-serial provisioning at https://web.esphome.io
-#
-# To build without improv-serial: uncomment the network, ssid and password lines
-# then update the SSID and password in secrets.yaml. 
-# Also delete the ap:, captive_portal and improv_serial blocks if you arent using them.
-#
-#  networks:
-#   - ssid: !secret wifi_ssid
-#     password: !secret wifi_password
+  networks:
+   - ssid: !secret wifi_ssid
+     password: !secret wifi_password
   ap:
     ssid: "Sprinkler Fallback Hotspot"
     password: !secret wifi_password
-
-captive_portal:
-
-#
-# Improv  configuration over serial port
-#
-
-improv_serial:
-
 
 #
 # webserver
@@ -324,7 +309,7 @@ external_components:
   - source:
       type: local
       path: external_components
-    components: [ "lcd_base", "valve_dog" ] # These external components are customized version of the component in esphome to work with the display, and the valve watchdog .
+    components: [ "valve_dog" ] # These external components are customized version of the component in esphome to work with the display, and the valve watchdog .
     
     
     
