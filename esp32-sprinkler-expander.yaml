@@ -249,7 +249,7 @@ esphome:
       - delay: 10s
       - output.turn_off: fault_led
       - output.turn_off: lcd_backlight
-  min_version: "2024.2.1"
+  min_version: "2024.6.6"
 
 #
 # WiFi
@@ -316,7 +316,9 @@ api:
 #
 
 ota:
-  password: !secret esphome_ota_password
+  - platform: esphome
+    password: !secret esphome_ota_password
+
 
 #
 # Dashboard import
