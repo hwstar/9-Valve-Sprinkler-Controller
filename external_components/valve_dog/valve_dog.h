@@ -16,19 +16,19 @@
 
 #include "esphome.h"
 #include "esphome/core/log.h"
-
+#include "esphome/core/gpio.h" // ESPHome Hardware Abstraction Layer
 
 namespace esphome {
 namespace valve_dog {
 
-
 class ValveDog : public Component {
   
-protected:
-   sprinkler::Sprinkler *sprc_obj;
+ protected:
+  sprinkler::Sprinkler *sprc_obj;
+  InternalGPIOPin *dog_pin_{nullptr}; // Pointer to the native ESPHome GPIO pin object
+  bool pin_state;
   
  public:
-    
   // Constructor
   ValveDog();
     
@@ -38,10 +38,11 @@ protected:
   
   void set_sprinkler(sprinkler::Sprinkler *sprinkler_id); 
   
-  void dump_config() override;
+  // Public setter to pass the GPIO configuration down from Python/YAML
+  void set_dog_pin(InternalGPIOPin *pin);
   
-protected:
-  bool pin_state;
+  void dump_config() override;
 };
-}  // namespace lcd_base
+
+}  // namespace valve_dog
 }  // namespace esphome

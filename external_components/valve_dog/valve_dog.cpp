@@ -12,52 +12,55 @@
 // function with the sprinkler controller name passed as an argument.
 // Refer to the note below.
 
-#include "esphome.h"
+#include "valve_dog.h"
 
 namespace esphome {
 namespace valve_dog {
 
-
-static const int DOG_PIN = 16;
-
 static const char *TAG = "valve_dog.component";
 
 ValveDog::ValveDog(){
-  this->sprc_obj = NULL; // Make sure this is set to NULL initially or bad things will happen!
+  this->sprc_obj = nullptr; // Make sure this is set to nullptr initially or bad things will happen!
 }
 
 void ValveDog::setup(){
   // Called once
   ESP_LOGD(TAG, "Valve_dog setup() called");
   this->pin_state = false;
-  pinMode(DOG_PIN, OUTPUT);
-  digitalWrite(DOG_PIN, pin_state);
+  
+  if (this->dog_pin_ != nullptr) {
+    this->dog_pin_->setup();
+    this->dog_pin_->digital_write(this->pin_state);
+  }
 }
 
 // Setter for sprinkler controller object
-
 void ValveDog::set_sprinkler(sprinkler::Sprinkler *sprinkler_id) {
-   ESP_LOGD(TAG, "set_sprinkler() called");
+  ESP_LOGD(TAG, "set_sprinkler() called");
   this->sprc_obj = sprinkler_id;
 }
 
-//  Enable or disable the valve watchdog
-
-
+// Setter for the native GPIO Pin object
+void ValveDog::set_dog_pin(InternalGPIOPin *pin) {
+  this->dog_pin_ = pin;
+}
 
 void ValveDog::loop() {
   // Called repeatedly
+  if (this->dog_pin_ == nullptr) {
+    return;
+  }
   
-  if((this->sprc_obj != NULL) && 
+  if((this->sprc_obj != nullptr) && 
   (this->sprc_obj->any_controller_is_active())){ // If any sprinkler controller is active
         // Toggle the valve watchdog pin if enabled
         this->pin_state = !this->pin_state;
-        digitalWrite(DOG_PIN, this-> pin_state);
+        this->dog_pin_->digital_write(this->pin_state);
   }
   else {
-   // Force  the valve watchdog pin low
+   // Force the valve watchdog pin low
    this->pin_state = false;
-   digitalWrite(DOG_PIN, this->pin_state);
+   this->dog_pin_->digital_write(this->pin_state);
   }
 }
 
@@ -67,8 +70,8 @@ void ValveDog::dump_config(){
     else
       ESP_LOGCONFIG(TAG, "Sprinkler object not set");
   }
-} // Valve Dog
-} // Esphome
+} // namespace valve_dog
+} // namespace esphome
 
 
 

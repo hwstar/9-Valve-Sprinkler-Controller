@@ -53,7 +53,7 @@ substitutions:
    valve_8_switch_name: "Valve 8"
    
    # Pump valve enable name
-   pump_valve_enable_name: "Main/Pump Valve Enable"
+   pump_valve_enable_name: "Main-Pump Valve Enable"
    
    # Valve enable entity names
    valve_1_enable_name: "Valve Enable 1"
@@ -71,15 +71,15 @@ substitutions:
 #
 
 time:
-  - platform: homeassistant
-    id: homeassistant_time
+#  - platform: homeassistant
+#    id: homeassistant_time
 
   - platform: sntp
     timezone: America/Los_Angeles
     id: sntp_time
     on_time_sync:
       then:
-        - ds1307.write_time
+        - ds1307.write_time:
         - logger.log:
             level: INFO
             format:  "Time synchronized. Wrote time to DS1307"
@@ -87,6 +87,7 @@ time:
   - platform: ds1307
     update_interval: never
     id: ds1307_time
+    i2c_id: bus_a
     
     # Use the DS3107 time to trigger watering programs
     
@@ -166,12 +167,12 @@ script:
 #
 
 globals:
-  - id: valves_status_string # Contains the vale state shown on line 2 of the display
+  - id: valves_status_string
     type: std::string
     restore_value: no
-    initial_value: '"${valves_idle_string}"'
+    initial_value: '"All Valves OFF"'
     
-  - id: display_ip_address # Toggles the display between IP address and valve state
+  - id: display_ip_address
     type: bool
     restore_value: no
     initial_value: "false"
@@ -208,37 +209,55 @@ globals:
 
 esphome:
   name: esp32-sprinkler
-  platform: ESP32
-  board: esp32dev
-  name_add_mac_suffix: true # Adds a 6 digit MAC suffix to the name defined above. Can be used to distinguish between multiple controllers.
+  name_add_mac_suffix: true
   project:
     name: esphome.project-template
     version: "1.0"
   on_boot:
-    then:
-      # Read time from RTC so we have something to start with while we get time from the network.
-      # RTC will be updated periodically with time from the Internet
-      # or Home Assistant if there is a network connection.
-      - ds1307.read_time:
-      # LED test
-      - output.turn_on: lcd_backlight
-      - delay: 10s
-      - output.turn_off: fault_led
-      - output.turn_off: lcd_backlight
+    - priority: 600.0 
+      then:
+        # Read time from RTC so we have something to start with while we get time from the network.
+        # RTC will be updated periodically with time from the Internet
+        # if there is a network connection.
+        #
+        - ds1307.read_time: 
+        - logger.log:
+            level: INFO
+            format:  "DS1307 Time read from chip"
+        # LED test
+        - output.turn_on: lcd_backlight
+        - delay: 10s
+        - output.turn_off: fault_led
+        - output.turn_off: lcd_backlight
   min_version: "2024.6.6"
+
+esp32:
+  board: esp32dev
 
 #
 # WiFi
 #
 
 wifi:
- 
-  networks:
-   - ssid: !secret wifi_ssid
-     password: !secret wifi_password
+
   ap:
-    ssid: "Sprinkler Fallback Hotspot"
-    password: !secret wifi_password
+    ssid: sprinkler_controller_lab
+    password: !secret esphome_fallback_wifi_password
+  id: esp32_sprinkler_controller_test
+  ssid: qrvc-ap-04
+  password: !secret wifi_password
+  power_save_mode: NONE
+  reboot_timeout: 24h
+
+    
+captive_portal:
+
+#
+# Improv  configuration over serial port
+#
+
+improv_serial:
+
 
 #
 # webserver
@@ -273,15 +292,15 @@ api:
 #          key: !secret api_key
 
    # Exposed services
-  services:
-    - service: set_multiplier # Set watering multiplier
+  actions:
+    - action: set_multiplier # Set watering multiplier
       variables:
         multiplier: float
       then:
         - sprinkler.set_multiplier: 
             id: sprinkler_controller
             multiplier: !lambda 'return multiplier;'
-    - service: force_shutdown  # Shut down any running sprinklers
+    - action: force_shutdown  # Shut down any running sprinklers
       then:
         - sprinkler.shutdown: sprinkler_controller         
         - logger.log:
@@ -310,8 +329,7 @@ external_components:
   - source:
       type: local
       path: external_components
-    components: [ "valve_dog" ] # These external components are customized version of the component in esphome to work with the display, and the valve watchdog .
-    
+    components: ["valve_dog" ] # These external components are customized versions of the components in esphome to work with the display and the sprinker.
     
     
 interval:
@@ -469,11 +487,11 @@ display:
             // This handles the state of the fault LED for all fault types
             if(id(has_fault) == false){
                 // Turn off fault LED
-                digitalWrite(14, false);
+                id(fault_led).turn_off();
             }
             else{
                  // Turn on fault LED
-                digitalWrite(14, true);
+                id(fault_led).turn_on();
             }
             // If no WiFi fault, cycle through valve state, ip address, ssid, and rssi
             if(id(wifi_connection_state) == true)
@@ -490,7 +508,8 @@ display:
                 else{
                   // No valves open
                   // Line 1
-                  it.print(0, 1, id(to_string("${valves_idle_string}")));
+                  id(valves_status_string) = "All Valves OFF";
+                  it.print(0, 1, id(valves_status_string));
                   }
                 break;
               case 1: // IP Address
@@ -515,10 +534,10 @@ display:
               // If no fault, then set turn on fault led
               // This will flash the fault led if there isn't any WiFi connection.
               if(id(has_fault) == false){
-                digitalWrite(14, true);
+                id(fault_led).turn_on();
               }
               // Line 1
-              it.print(0, 1, id(to_string("${no_wifi_string}")));  
+              it.print(0, 1, "${no_wifi_string}");  
             }
         }
 
@@ -538,11 +557,11 @@ valve_dog:
 #
 
 
+# Crucial configuration to enable communication with the DS1307
 i2c:
-  sda: 21
-  scl: 22
-  id: bus_a
-
+  sda: GPIO21
+  scl: GPIO22
+  id: bus_a 
 
 #
 # pca9554 GPIO Expander
@@ -632,7 +651,7 @@ switch:
         format: "Valve 1 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_1_on_string}");
+        id(valves_status_string) = "${valve_1_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -653,7 +672,7 @@ switch:
         format: "Valve 2 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_2_on_string}");
+        id(valves_status_string) = "${valve_2_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -675,7 +694,7 @@ switch:
         format: "Valve 3 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_3_on_string}");
+        id(valves_status_string) = "${valve_3_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -698,7 +717,7 @@ switch:
         format: "Valve 4 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_4_on_string}");
+        id(valves_status_string) = "${valve_4_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -719,7 +738,7 @@ switch:
         format: "Valve 5 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_5_on_string}");
+        id(valves_status_string) = "${valve_5_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -741,7 +760,7 @@ switch:
         format: "Valve 6 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_6_on_string}");
+        id(valves_status_string) = "${valve_6_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -762,7 +781,7 @@ switch:
         format: "Valve 7 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_7_on_string}");
+        id(valves_status_string) = "${valve_7_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -785,7 +804,7 @@ switch:
         format: "Valve 8 turned on"
         level: "INFO"
     - lambda: |-
-        id(valves_status_string) = to_string("${valve_8_on_string}");
+        id(valves_status_string) = "${valve_8_on_string}";
 
     on_turn_off:
     - logger.log:
@@ -881,7 +900,7 @@ binary_sensor:
           - logger.log:
               format:    "Watering stopped from local button"
               level:  INFO
-          - sprinkler.shutdown: sprinkler_controller
+          - sprinkler.shutdown: sprinkler_ctrlr
        
         
 
