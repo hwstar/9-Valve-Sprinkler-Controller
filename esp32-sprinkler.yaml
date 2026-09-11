@@ -900,7 +900,7 @@ binary_sensor:
           - logger.log:
               format:    "Watering stopped from local button"
               level:  INFO
-          - sprinkler.shutdown: sprinkler_ctrlr
+          - sprinkler.shutdown: sprinkler_controller
        
         
 

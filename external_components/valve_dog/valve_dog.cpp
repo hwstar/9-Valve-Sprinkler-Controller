@@ -65,11 +65,12 @@ void ValveDog::loop() {
 }
 
 void ValveDog::dump_config(){
-    if(this->sprc_obj)
+    if(this->sprc_obj){
       ESP_LOGCONFIG(TAG, "Sprinkler object set");
-    else
+    }
+    else {
       ESP_LOGCONFIG(TAG, "Sprinkler object not set");
-  }
+    }
 } // namespace valve_dog
 } // namespace esphome
 
