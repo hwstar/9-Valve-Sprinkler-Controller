@@ -71,6 +71,7 @@ void ValveDog::dump_config(){
     else {
       ESP_LOGCONFIG(TAG, "Sprinkler object not set");
     }
+  } // end method
 } // namespace valve_dog
 } // namespace esphome
 
